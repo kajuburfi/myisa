@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+// An enum for instructions
 typedef enum Instruction Instr;
 enum Instruction {
   lw,
@@ -38,15 +39,17 @@ enum Regs {
   flg,
   hi,
   lo,
-  zero,
+  zero, // Yes; zero is 15 or 0xF
 };
 
 // Smart stuff to split a short integers(16 bits) into 4 pieces of 4 bits each
+// Picked up from [1]
 typedef union {
   short int int_val;
   char char_vals[4];
 } int_to_bytes;
 
+// Converts the string in the code to a Reg
 Reg str_to_reg(char *s) {
   if (strcmp(s, "r0") == 0)
     return r0;
@@ -83,6 +86,7 @@ Reg str_to_reg(char *s) {
   return zero;
 }
 
+// Similarly, converts a read string into an Instr
 Instr str_to_instr(char *s) {
   if (strcmp(s, "lw") == 0)
     return lw;
@@ -117,13 +121,13 @@ Instr str_to_instr(char *s) {
 
 // Takes in a string pointer and modifies it such that there are no "extra"
 // spaces and no commas.
-// This also removes newlines.
+// This also removes newlines and comments.
 void del_extra_spaces_n_commas(char *s) {
   char *d = s;
   // replace '\n' with '\0' ;)
   if (*d == '\n')
     *s = '\0';
-  // Comments
+  // Comments - Only single line comments, starting with `;` are allowed.
   if (strncmp(s, ";", 1) == 0) {
     *s = '\0';
     return;
@@ -133,25 +137,30 @@ void del_extra_spaces_n_commas(char *s) {
     while ((*d == ' ' && *(d + 1) == ' ') || *d == ',' || *d == '\n')
       d++;
   } while ((*s++ = *d++));
+  // Yes; we are checking the return value of the assignment in the above stmt
 }
 
 int main(int argc, char *argv[]) {
+  // Give only one argument(as of now)
   if (argc != 2) {
     printf("Error: Please provide the .asm file");
     return 1;
   }
 
+  // Open both read and write files.
   FILE *fp = fopen(argv[1], "r");
-  FILE *fop = fopen("output.bin", "wb");
+  FILE *fop = fopen("output.bin", "wb"); // Write in binary
 
-  if (fp == NULL) {
+  if (fp == NULL || fop == NULL) {
     printf("Error: Cannot open file.");
     return 1;
   }
 
-  char buf[256];
+  char buf[256]; // This is to read a line of not more than 256 characters
+  // The condition in the while iterates over every line in the file
   while (fgets(buf, sizeof(buf), fp) != NULL) {
-    del_extra_spaces_n_commas(buf);
+    del_extra_spaces_n_commas(buf); // Does exactly what it says it does
+    // If it's an empty line, skip over.
     if (strcmp(buf, "\0") == 0)
       continue;
 
@@ -159,22 +168,26 @@ int main(int argc, char *argv[]) {
     // must be a register. Hence, the first time, you check for instr, after
     // that, you just check for regs
     short int is_instr = 1;
-    // NOTE: Funnily enough, all `char` is, is just 1 byte of storage; we can do
-    // whatever we want with that 1 byte. Here, I'm storing each byte of the
-    // instruction as an array of "characters", but it stores integers.
+    // NOTE: Funnily enough, all `char` is, is just 1 byte of storage; we can
+    // do whatever we want with that 1 byte. Here, I'm storing each byte of
+    // the instruction as an array of "characters", but it stores integers.
     char instruction[4] = {0}; // Instruction to write in binary
     short int i = 0;           // Counter for instruction
 
-    // Make the instruction array
+    // Split the line into instruction and its arguments
     char *token = strtok(buf, " ");
 
     while (token != NULL) {
       if (is_instr) {
         Instr instr = str_to_instr(token); // Get the instruction as the enum
 
+        // A bunch of stuff to do if it's an immediate type
         if (instr == imm) {
+          // Cool stuff to convert str to int
           int_to_bytes temp;
           if (strncmp(token, "0d", 2) == 0)
+            // Crazy hack(Unfortunately, it would depend of the endianness of
+            // the system)
             sscanf(token + 2, "%hd", &temp.int_val);
           else if (strncmp(token, "0x", 2) == 0)
             sscanf(token + 2, "%hx", &temp.int_val);
@@ -182,11 +195,12 @@ int main(int argc, char *argv[]) {
           for (int j = 0; j < 4; j++)
             instruction[j] = temp.char_vals[j];
 
-          // For immediates, the first two and last two bits are to be swapped.
+          // For immediates, the first and second bit are to be swapped
           char temp1;
           temp1 = instruction[0];
           instruction[0] = instruction[1];
           instruction[1] = temp1;
+
           break;
         }
 
@@ -198,12 +212,16 @@ int main(int argc, char *argv[]) {
         instruction[i++] = reg;
       }
 
+      // Move over to the next part of the line
       token = strtok(NULL, " ");
     }
 
-    // Doing this because the minimum size of data is 1 byte, but I need 4 bits
-    // of info here.
+    // NOTE: If it is an immediate value, then the value of `is_instr` will be
+    // zero, since we change it after the imm portion. So, we use that to check
+    // if the instruction[] contains an instruction or an immediate value.
     if (!is_instr) {
+      // Doing this because the minimum size of data is 1 byte, but I need 4
+      // bits of info here.
       char final_instr[2];
       final_instr[0] = (instruction[0] << 4) + instruction[1];
       final_instr[1] = (instruction[2] << 4) + instruction[3];
@@ -227,7 +245,8 @@ https://stackoverflow.com/questions/51555676/how-to-divide-an-int-into-two-bytes
 [2] https://www.geeksforgeeks.org/c/convert-string-to-int-in-c/
 [3] https://www.w3schools.com/c/c_enums.php
 [4] https://little-book-of.github.io/c/        REALLY GOOD RESOURCE
-[5] https://stackoverflow.com/questions/17598572/how-to-read-write-a-binary-file
+[5]
+https://stackoverflow.com/questions/17598572/how-to-read-write-a-binary-file
 
 
 
