@@ -4,12 +4,59 @@
 short int mem[65536] = {0};
 short int reg[16] = {0};
 
+// An enum for instructions
+typedef enum Instruction Instr;
+enum Instruction {
+  lw,
+  sw,
+  nand,
+  nandi,
+  add,
+  addi,
+  sub,
+  mul,
+  div,
+  cmp,
+  b,
+  beq,
+  bgt,
+  imm,
+  nop = 15, // 1111 -> Does no operation
+};
+
+// An enum for registers. Easy to convert symbolic repr. and binary value
+typedef enum Regs Reg;
+enum Regs {
+  r0,
+  r1,
+  r2,
+  r3,
+  r4,
+  r5,
+  r6,
+  r7,
+  r8,
+  r9,
+  pc,
+  ibr,
+  flg,
+  hi,
+  lo,
+  zero, // Yes; zero is 15 or 0xF
+};
+
+typedef union {
+  short int int_val;
+  char char_vals[4];
+} int_to_bytes;
+
 // Reads through the file pointer, and loads the pgm into the memory
 // Returns the end of the program portion.
 short load_pgm_into_mem(char *name) {
   FILE *fp = fopen(name, "rb");
   if (!fp)
-    return -1;
+    return 0; // The program shouldn't be 65535 instructions long.(Otherwise you
+              // get this error)
 
   char buf[2];            // We read as chars
   short int idx = 0xFFFF; // Index to store into
@@ -17,14 +64,29 @@ short load_pgm_into_mem(char *name) {
   while (fread(buf, sizeof(buf), 1, fp) == 1) {
     // I want to store it as short int(16 bits)
     short val = (((short)buf[0]) << 8) | (0x00FF & buf[1]);
-    mem[idx--] = val;
+    mem[idx] = val;
     // The below line prints the pgm in mem
     printf("%X %04X\n", idx & 0x0000FFFF, val & 0x0000FFFF);
+    idx--;
   }
   // printf("Bottom line of pgm is %x", idx);
   fclose(fp);
 
   return idx;
+}
+
+char *get_split_instr(char *split_instr) {
+  int_to_bytes temp;
+  temp.int_val = mem[reg[0xA]];
+  split_instr[0] = (temp.char_vals[1] & 0xF0) >> 4;
+  split_instr[1] = temp.char_vals[1] & 0x0F;
+  split_instr[2] = (temp.char_vals[0] & 0xF0) >> 4;
+  split_instr[3] = temp.char_vals[0] & 0x0F;
+  // The below code prints the split for a particular mem
+  // for (int i = 0; i < 4; i++)
+  //   printf("%x ", split_instr[i]);
+  // printf("\n");
+  return split_instr;
 }
 
 void set_up_regs() { reg[0xA] = 0xFFFF; }
@@ -37,10 +99,19 @@ int main(int argc, char *argv[]) {
 
   set_up_regs();
   short pgm_end = load_pgm_into_mem(argv[1]);
-  if (pgm_end < 0) {
+  if (pgm_end == 0) {
     printf("Error: Couldn't open binary provided\n");
     return 1;
   }
+
+  char split_instr[4] = {0}; // This contains the bits of the instruction
+  do {
+    get_split_instr(split_instr);
+
+    for (int j = 0; j < 4; j++)
+      printf("%x ", split_instr[j]);
+    printf("\n");
+  } while (reg[0xA]-- != pgm_end);
   return 0;
 }
 
