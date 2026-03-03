@@ -231,6 +231,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  fclose(fp);
+  fclose(fop);
   return 0;
 }
 
