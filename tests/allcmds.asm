@@ -17,20 +17,20 @@ div r2, r0
 div r2, r3
 cmp r3, r3
 cmp r2, r1
-addi r7, zero,
-0xFFE6
-; b r7
+addi r7, pc,
+0d-3
+b r7
 nop
 nop
 cmp r6, r6
 addi r7, pc,
-0d2
-; beq r7
+0d-2
+beq r7
 nop
 nop
 addi r7, pc,
-0d3
-; bgt r7
+0d-3
+bgt r7
 nop
 nop
 nop

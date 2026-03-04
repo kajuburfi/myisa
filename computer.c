@@ -129,17 +129,17 @@ void do_instr(char *split_instr) {
     reg[lo] = reg[rd] % reg[rs];
   } else if (instr == cmp) { // 1001
     if (reg[rd] > reg[rs])
-      reg[flg] = reg[flg] | 0b0000000000000010;
+      reg[flg] = 0b0000000000000010;
     if (reg[rd] == reg[rs])
-      reg[flg] = reg[flg] | 0b0000000000000001;
+      reg[flg] = 0b0000000000000001;
   } else if (instr == b) { // 1010
     // Plus one because we are subtracting at the end of this function
     reg[pc] = reg[rd] + 1;
   } else if (instr == beq) {
-    if ((reg[flg] & 0x0001) == 1)
+    if (reg[flg] == 1)
       reg[pc] = reg[rd];
   } else if (instr == bgt) {
-    if ((reg[flg] & 0x0002) == 2)
+    if (reg[flg] == 2)
       reg[pc] = reg[rd];
   }
   print_regs();
