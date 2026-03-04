@@ -230,6 +230,8 @@ int main(int argc, char *argv[]) {
       fwrite(instruction, sizeof(char), 2, fop);
     }
   }
+  char halt_instr[2] = {0xFF, 0xFF};
+  fwrite(halt_instr, sizeof(char), 2, fop);
 
   fclose(fp);
   fclose(fop);
