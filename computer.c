@@ -4,6 +4,13 @@
 short int mem[65536] = {0};
 short int reg[16] = {0};
 
+void print_regs() {
+  printf("REGS: ");
+  for (short i = 0; i < 16; i++)
+    printf("%X ", reg[i] & 0x0000FFFF);
+  printf("\n");
+}
+
 // An enum for instructions
 typedef enum Instruction Instr;
 enum Instruction {
@@ -77,7 +84,7 @@ short load_pgm_into_mem(char *name) {
 
 char *get_split_instr(char *split_instr) {
   int_to_bytes temp;
-  temp.int_val = mem[reg[0xA]];
+  temp.int_val = mem[reg[pc]];
   split_instr[0] = (temp.char_vals[1] & 0xF0) >> 4;
   split_instr[1] = temp.char_vals[1] & 0x0F;
   split_instr[2] = (temp.char_vals[0] & 0xF0) >> 4;
@@ -89,7 +96,68 @@ char *get_split_instr(char *split_instr) {
   return split_instr;
 }
 
-void set_up_regs() { reg[0xA] = 0xFFFF; }
+void do_instr(char *split_instr) {
+  Instr instr = split_instr[0];
+  Reg rd = split_instr[1];
+  Reg rs = split_instr[2];
+  Reg rt = split_instr[3];
+
+  if (instr == lw) { // 0000
+    short imm = mem[--reg[pc]];
+    reg[rd] = mem[reg[rs] + imm];
+  } else if (instr == sw) { // 0001
+    short imm = mem[--reg[pc]];
+    mem[reg[rs] + imm] = reg[rd];
+  } else if (instr == nand) { // 0010
+    reg[rd] = !(reg[rs] & reg[rt]);
+  } else if (instr == nandi) { // 0011
+    short imm = mem[--reg[pc]];
+    reg[rd] = !(reg[rs] & imm);
+  } else if (instr == add) { // 0100
+    reg[rd] = reg[rs] + reg[rt];
+  } else if (instr == addi) { // 0101
+    short imm = mem[--reg[pc]];
+    reg[rd] = reg[rs] + imm;
+  } else if (instr == sub) { // 0110
+    reg[rd] = reg[rs] - reg[rt];
+  } else if (instr == mul) { // 0111
+    int sol = reg[rd] * reg[rs];
+    reg[hi] = (sol >> 16) & 0x0000FFFF;
+    reg[lo] = sol & 0x0000FFFF;
+  } else if (instr == div) { // 1000
+    reg[hi] = reg[rd] / reg[rs];
+    reg[lo] = reg[rd] % reg[rs];
+  } else if (instr == cmp) { // 1001
+    if (reg[rd] > reg[rs])
+      reg[flg] = reg[flg] | 0b0000000000000010;
+    if (reg[rd] == reg[rs])
+      reg[flg] = reg[flg] | 0b0000000000000001;
+  } else if (instr == b) { // 1010
+    // Plus one because we are subtracting at the end of this function
+    reg[pc] = reg[rd] + 1;
+  } else if (instr == beq) {
+    if ((reg[flg] & 0x0001) == 1)
+      reg[pc] = reg[rd];
+  } else if (instr == bgt) {
+    if ((reg[flg] & 0x0002) == 2)
+      reg[pc] = reg[rd];
+  }
+  print_regs();
+  for (short i = 0; i < 20; i++)
+    printf("%x ", mem[i]);
+  printf("\n\n");
+  reg[pc]--;
+}
+
+void set_up_regs() { reg[pc] = 0xFFFF; }
+
+int compare_arrays(char arr1[], char arr2[], int size) {
+  for (int i = 0; i < size; i++)
+    if (arr1[i] != arr2[i])
+      return 0; // Arrays are not equal
+
+  return 1; // Arrays are equal
+}
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
@@ -104,14 +172,16 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  char split_instr[4] = {0}; // This contains the bits of the instruction
+  char split_instr[4]; // This contains the bits of the instruction
+  char instruction_halt[4] = {0x0F, 0x0F, 0x0F, 0x0F};
   do {
     get_split_instr(split_instr);
 
     for (int j = 0; j < 4; j++)
       printf("%x ", split_instr[j]);
     printf("\n");
-  } while (reg[0xA]-- != pgm_end);
+    do_instr(split_instr);
+  } while (!compare_arrays(split_instr, instruction_halt, 4));
   return 0;
 }
 
@@ -119,6 +189,6 @@ int main(int argc, char *argv[]) {
 
 ========== SOURCES ===========
 [1] https://stackoverflow.com/questions/17768625/2-chars-to-short-in-c
-
+[2] https://stackoverflow.com/questions/11656532/returning-an-array-using-c
 
 */
