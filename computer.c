@@ -1,12 +1,12 @@
 #include <stdio.h>
 
 // Global memory and registers
-short int mem[65536] = {0};
-short int reg[16] = {0};
+int mem[65536] = {0};
+int reg[16] = {0};
 
 void print_regs() {
   printf("REGS: ");
-  for (short i = 0; i < 16; i++)
+  for (int i = 0; i < 16; i++)
     printf("%X ", reg[i] & 0x0000FFFF);
   printf("\n");
 }
@@ -53,24 +53,24 @@ enum Regs {
 };
 
 typedef union {
-  short int int_val;
+  int int_val;
   char char_vals[4];
 } int_to_bytes;
 
 // Reads through the file pointer, and loads the pgm into the memory
 // Returns the end of the program portion.
-short load_pgm_into_mem(char *name) {
+int load_pgm_into_mem(char *name) {
   FILE *fp = fopen(name, "rb");
   if (!fp)
     return 0; // The program shouldn't be 65535 instructions long.(Otherwise you
               // get this error)
 
-  char buf[2];            // We read as chars
-  short int idx = 0xFFFF; // Index to store into
+  char buf[2];      // We read as chars
+  int idx = 0xFFFF; // Index to store into
   // Reading loop
   while (fread(buf, sizeof(buf), 1, fp) == 1) {
-    // I want to store it as short int(16 bits)
-    short val = (((short)buf[0]) << 8) | (0x00FF & buf[1]);
+    // I want to store it as int int(16 bits)
+    int val = (((int)buf[0]) << 8) | (0x00FF & buf[1]);
     mem[idx] = val;
     // The below line prints the pgm in mem
     printf("%X %04X\n", idx & 0x0000FFFF, val & 0x0000FFFF);
@@ -103,20 +103,20 @@ void do_instr(char *split_instr) {
   Reg rt = split_instr[3];
 
   if (instr == lw) { // 0000
-    short imm = mem[--reg[pc]];
+    int imm = mem[--reg[pc]];
     reg[rd] = mem[reg[rs] + imm];
   } else if (instr == sw) { // 0001
-    short imm = mem[--reg[pc]];
+    int imm = mem[--reg[pc]];
     mem[reg[rs] + imm] = reg[rd];
   } else if (instr == nand) { // 0010
     reg[rd] = !(reg[rs] & reg[rt]);
   } else if (instr == nandi) { // 0011
-    short imm = mem[--reg[pc]];
+    int imm = mem[--reg[pc]];
     reg[rd] = !(reg[rs] & imm);
   } else if (instr == add) { // 0100
     reg[rd] = reg[rs] + reg[rt];
   } else if (instr == addi) { // 0101
-    short imm = mem[--reg[pc]];
+    int imm = mem[--reg[pc]];
     reg[rd] = reg[rs] + imm;
   } else if (instr == sub) { // 0110
     reg[rd] = reg[rs] - reg[rt];
@@ -143,7 +143,7 @@ void do_instr(char *split_instr) {
       reg[pc] = reg[rd];
   }
   print_regs();
-  for (short i = 0; i < 20; i++)
+  for (int i = 0; i < 20; i++)
     printf("%x ", mem[i]);
   printf("\n\n");
   reg[pc]--;
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
   }
 
   set_up_regs();
-  short pgm_end = load_pgm_into_mem(argv[1]);
+  int pgm_end = load_pgm_into_mem(argv[1]);
   if (pgm_end == 0) {
     printf("Error: Couldn't open binary provided\n");
     return 1;
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
 /*
 
 ========== SOURCES ===========
-[1] https://stackoverflow.com/questions/17768625/2-chars-to-short-in-c
+[1] https://stackoverflow.com/questions/17768625/2-chars-to-int-in-c
 [2] https://stackoverflow.com/questions/11656532/returning-an-array-using-c
 
 */
