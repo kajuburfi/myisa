@@ -103,21 +103,21 @@ void do_instr(char *split_instr) {
   Reg rt = split_instr[3];
 
   if (instr == lw) { // 0000
-    int imm = mem[--reg[pc]];
-    reg[rd] = mem[reg[rs] + imm];
+    reg[ibr] = mem[--reg[pc]];
+    reg[rd] = mem[reg[rs] + reg[ibr]];
   } else if (instr == sw) { // 0001
-    int imm = mem[--reg[pc]];
-    mem[reg[rs] + imm] = reg[rd];
+    reg[ibr] = mem[--reg[pc]];
+    mem[reg[rs] + reg[ibr]] = reg[rd];
   } else if (instr == nand) { // 0010
     reg[rd] = !(reg[rs] & reg[rt]);
   } else if (instr == nandi) { // 0011
-    int imm = mem[--reg[pc]];
-    reg[rd] = !(reg[rs] & imm);
+    reg[ibr] = mem[--reg[pc]];
+    reg[rd] = !(reg[rs] & reg[ibr]);
   } else if (instr == add) { // 0100
     reg[rd] = reg[rs] + reg[rt];
   } else if (instr == addi) { // 0101
-    int imm = mem[--reg[pc]];
-    reg[rd] = reg[rs] + imm;
+    reg[ibr] = mem[--reg[pc]];
+    reg[rd] = reg[rs] + reg[ibr];
   } else if (instr == sub) { // 0110
     reg[rd] = reg[rs] - reg[rt];
   } else if (instr == mul) { // 0111
