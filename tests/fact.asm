@@ -2,7 +2,7 @@
 
 ; r0 contains the number whose factorial we want
 addi r0, zero,
-0d5
+0d7
 
 addi r1, zero,
 0d1

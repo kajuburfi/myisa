@@ -2,7 +2,7 @@
 
 ; r0 contains the max value we want to go till 
 addi r0, zero,
-0d20
+0d15
 
 ; r1 and r2 will be repeatedly added together to get the new values of fibonacci
 addi r1, zero,
