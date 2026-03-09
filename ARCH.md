@@ -1,6 +1,6 @@
 # Instruction Set Architecture
 
-This is a (WIP) basic ISA inspired by MIPS, RISC-V, IAS computer architectures.
+This is a basic ISA inspired by MIPS, RISC-V, IAS computer architectures.
 
 ## Memory and Storage
 
@@ -17,6 +17,30 @@ All the data that can be stored starts from `0x0000` and grows upwards.
 Following this, we don't implement a clear distinction between the two sections.
 
 <!-- Insert image here -->
+```mermaid
+
+---
+config:
+    packet:
+        rowHeight: 24
+        bitWidth: 8
+        bitsPerRow: 16
+        showBits: false
+        paddingX: 5
+        paddingY: 0
+---
+packet
++16: "0xFFFF"
++16: "0xFFFE"
++16: "0xFFFD"
++16: "."
++16: "."
++16: "."
++16: "0x0002"
++16: "0x0001"
++16: "0x0000"
+
+```
 
 It is made with the intention to give complete control over the 128kB to the programmer.
 The programmer can thus make programs that overwrite the program itself, as it can
@@ -41,7 +65,24 @@ The other 10 registers, `r0`, `r1`, ..., `r9`, are available to the programmer.
 The way the instructions are encoded are as follows. Each instruction has a 4 bit opcode,
 and can take upto 3 operands. For the _R-type_(register) instructions, they are stored as such.
 
-<!-- Insert img --> 
+```mermaid
+---
+config:
+    packet:
+        rowHeight: 32
+        bitWidth: 16
+        bitsPerRow: 16
+        showBits: true
+        paddingX: 5
+        paddingY: 5
+---
+packet
++4: "OpCode"
++4: "rd"
++4: "rs"
++4: "0000"
++16: "imm"
+```
 
 For immediates, a little more involvement comes into picture.
 
@@ -50,12 +91,12 @@ For immediates, a little more involvement comes into picture.
 
 Whenever immediates are included, they are placed on a separate line. A common instruction like `addi`
 would look like this:
-```
-addi r1, r2
+```asm
+addi r1, r2,
 49
 
-# OR
-addi r1, r2
+; OR
+addi r1, r2,
 0x48E2
 ```
 
@@ -68,7 +109,24 @@ but this would increase our instruction set, and we had a hard limit of 16 instr
 
 Hence, immediate instructions would be stored as:
 
-<!-- Insert img --> 
+```mermaid
+---
+config:
+    packet:
+        rowHeight: 32
+        bitWidth: 16
+        bitsPerRow: 16
+        showBits: true
+        paddingX: 5
+        paddingY: 5
+---
+packet
++4: "OpCode"
++4: "rd"
++4: "rs"
++4: "0000"
++16: "imm"
+```
 
 ## Instruction Set
 
@@ -90,3 +148,6 @@ Here is the instruction set implemented.
 | `1011` | `beq r1` | Sets `pc = r1` if `flg.eq == 1` |
 | `1100` | `bgt r1` | Sets `pc = r1` if `flg.gt == 1` |
 
+Clearly, this is not a very involved ISA, but it is enough to implement basically anything a modern computer can(with a lot more effort).
+It is mostly a PoC, and sort of an exercise for me.
+Some examples here are the [Fibonacci series](./tests/fibo.asm) and the [Factorial function](./tests/fact.asm).
