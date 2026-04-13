@@ -80,8 +80,7 @@ packet
 +4: "OpCode"
 +4: "rd"
 +4: "rs"
-+4: "0000"
-+16: "imm"
++4: "rt"
 ```
 
 For immediates, a little more involvement comes into picture.
