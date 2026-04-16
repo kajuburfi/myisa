@@ -3,7 +3,8 @@ module top(
 );
   // Internal wires
   logic [15:0] pcm1, pcm2, pcnext, pcnew, pc, instr,
-          imm, rr1, rr2, srcB, aluout, rm, wd, a1_in;
+          imm, rr1, rr2, srcB, aluout, rm, wd;
+  logic [3:0] a1_in;
   // Ctrl signals
   logic is_imm, is_rwe, is_mwe, is_rd, is_memout, is_b;
   logic [2:0] ctrl_alu;
@@ -19,7 +20,7 @@ module top(
   imem imem_module(pc, pcm1, instr, imm);
   ctrl_unit ctrl_unit_module(instr[15:12], is_imm, is_rwe, is_mwe, is_memout, is_rd, ctrl_alu, ctrl_b);
 
-  mux mux_instr(instr[3:0], instr[11:8], is_rd, a1_in);
+  mux #(4) mux_instr(instr[3:0], instr[11:8], is_rd, a1_in);
 
   regfile rf_module(clk, is_rwe, a1_in, instr[7:4], instr[11:8], wd, rr1, rr2);
 

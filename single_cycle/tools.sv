@@ -35,7 +35,7 @@ endmodule
 module b_box
   (
     input logic [1:0] flg, ctrl_b,
-    output logic [1:0] is_b
+    output logic is_b
   );
   assign is_b = (ctrl_b[0] & ctrl_b[1]) | (ctrl_b[0] & flg[0]) | (ctrl_b[1] & flg[1]);
 endmodule

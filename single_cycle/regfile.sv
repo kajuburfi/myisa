@@ -15,7 +15,7 @@ module regfile(
   always_ff @(posedge clk) begin
     if (rwe) rf[a3] <= wd;
   end
-  assign rr1 = (a1 != 0) ? rf[ra1] : 0;
-  assign rr2 = (a2 != 0) ? rf[ra2] : 0;
+  assign rr1 = (a1 != 0) ? rf[a1] : 0;
+  assign rr2 = (a2 != 0) ? rf[a2] : 0;
 endmodule
 

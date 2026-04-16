@@ -3,7 +3,7 @@ module alu
     input logic [15:0] srca,
     input logic [15:0] srcb,
     input logic [2:0] ctrl_alu,
-    output logic [15:0] aluout,
+    output logic [15:0] aluout
   );
   // TODO: add mul and div
   always_comb begin

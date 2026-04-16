@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
 
   // Open both read and write files.
   FILE *fp = fopen(argv[1], "r");
-  FILE *fop = fopen("output.bin", "w");
+  FILE *fop = fopen("output.bin", "wb");
 
   if (fp == NULL || fop == NULL) {
     printf("Error: Cannot open file.");
@@ -170,6 +170,7 @@ int main(int argc, char *argv[]) {
       continue;
 
     // Adds `flg` as the register dest(rd) for each instr which requires that
+    // Source: [6]
     if (strncmp(buf, "cmp", 3) == 0 || strncmp(buf, "b ", 2) == 0 ||
         strncmp(buf, "bgt", 3) == 0 || strncmp(buf, "beq", 3) == 0) {
       char temp[256];
@@ -268,6 +269,8 @@ https://stackoverflow.com/questions/51555676/how-to-divide-an-int-into-two-bytes
 [4] https://little-book-of.github.io/c/        REALLY GOOD RESOURCE
 [5]
 https://stackoverflow.com/questions/17598572/how-to-read-write-a-binary-file
+[6]
+https://stackoverflow.com/questions/2015901/inserting-char-string-into-another-char-string
 
 
 
