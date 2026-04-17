@@ -14,7 +14,7 @@ module top(
   sub1 sub1_1(pcm1, pcm2);
   mux mux_pc1(pcm1, pcm2, is_imm, pcnext);
   mux mux_pc2(pcnext, rr2, is_b, pcnew);
-  dff dff_pc(clk, rst, pcnew, pc);
+  dff #(16, 16'd255) dff_pc(clk, rst, pcnew, pc);
   sub1 sub1_2(pc, pcm1);
 
   imem imem_module(pc, pcm1, instr, imm);
