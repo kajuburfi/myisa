@@ -9,7 +9,7 @@ module ctrl_unit(
   always_comb begin
     case (op)
       4'b0000: ctrls = 10'b1101000000; //lw
-      4'b0001: ctrls = 10'b1010000000; //sw
+      4'b0001: ctrls = 10'b1010100000; //sw
       4'b0010: ctrls = 10'b0100001000; //nand
       4'b0011: ctrls = 10'b1100001000; //nandi
       4'b0100: ctrls = 10'b0100000000; //add
