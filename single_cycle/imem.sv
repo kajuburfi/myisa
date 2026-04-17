@@ -13,7 +13,7 @@ module imem(
 
   int fd, code;
   int start = 0; // Start index
-  int count = 2; // Maximum memory index to read
+  int count = 255; // Maximum memory index to read
   logic [15:0] RAM_inv [0:255]; // Define memory array to store the data
   logic [15:0] RAM [0:255]; 
 

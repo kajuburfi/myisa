@@ -17,7 +17,7 @@ module ctrl_unit(
       4'b0110: ctrls = 10'b0100000100; //sub
       // 4'b0111: ctrls = 10'b // mul
       // 4'b0111: ctrls = 10'b // div
-      4'b1001: ctrls = 10'b0100100000; //cmp
+      4'b1001: ctrls = 10'b0100001100; //cmp
       4'b1010: ctrls = 10'b0000100011; //b
       4'b1011: ctrls = 10'b0000100001; //beq
       4'b1100: ctrls = 10'b0000100010; //bgt

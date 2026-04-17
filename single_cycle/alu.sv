@@ -12,7 +12,7 @@ module alu
       3'b001: aluout = srca - srcb; //sub
       3'b010: aluout = ~(srca & srcb); //nand
       // 3'b001: aluout = srca | srcb; //or
-      3'b011: aluout = srca > srcb ? 16'h0002 : 16'h0000; //sgt - for branch bgt
+      3'b011: aluout = (srca == srcb) ? 16'h0001 : ((srca > srcb) ? 16'h0002 : 16'h0000); //sgt - for cmp
       // 3'b011: aluout = srca ^ srcb; //xor
       // 3'b100: aluout = ~(srca | srcb); //nor
       default: aluout = {16{1'bx}}; // Set X value otherwise
