@@ -3,3 +3,9 @@ output.bin
 assembler
 computer
 sources.txt
+single_cycle/read_bin_file.sv
+single_cycle/proc
+single_cycle/dump.vcd
+single_cycle/assembler
+single_cycle/output.bin
+tests/a.asm
