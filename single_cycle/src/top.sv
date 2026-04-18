@@ -1,5 +1,6 @@
 module top(
-  input logic clk, rst
+  input logic clk, rst,
+  output logic is_halt
 );
   // Internal wires
   logic [15:0] pcm1, pcm2, pcnext, pcnew, pc, instr,
@@ -18,7 +19,7 @@ module top(
   sub1 sub1_2(pc, pcm1);
 
   imem imem_module(pc, pcm1, instr, imm);
-  ctrl_unit ctrl_unit_module(instr[15:12], is_imm, is_rwe, is_mwe, is_memout, is_rd, ctrl_alu, ctrl_b);
+  ctrl_unit ctrl_unit_module(instr[15:12], is_imm, is_rwe, is_mwe, is_memout, is_rd, is_halt, ctrl_alu, ctrl_b);
 
   mux #(4) mux_instr(instr[3:0], instr[11:8], is_rd, a1_in);
 

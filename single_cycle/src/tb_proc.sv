@@ -1,7 +1,7 @@
 module testbench();
-  logic clk, rst;
+  logic clk, rst, is_halt;
 
-  top dut (clk, rst);
+  top dut (clk, rst, is_halt);
 
   initial begin
     #500;
@@ -17,5 +17,7 @@ module testbench();
 
   always begin
     #5; clk = ~clk;
+    if (is_halt == 1)
+      $finish;
   end
 endmodule
