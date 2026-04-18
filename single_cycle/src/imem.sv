@@ -37,8 +37,8 @@ module imem(
       RAM[i] = RAM_inv[255-i];
     end
     // Display the contents of the first few memory locations
-    for (int i = 255; i > 235; i--) begin
-      $display("RAM[%0d] = %h", i, RAM[i]);
+    for (int i = 255; i > 205; i--) begin
+      $display("RAM[%0h] = %h", i, RAM[i]);
     end
     
     $fclose(fd);

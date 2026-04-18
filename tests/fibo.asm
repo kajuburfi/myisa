@@ -42,8 +42,10 @@ addi r9, r9,
 0d1
 ; jump back to loop (unconditional)
 addi r7, pc,
-;; This value must be (7+number of lines in LOGIC)
-0d14
+;; The following value must be
+;; - In c_impl (7+number of lines in LOGIC)
+;; - In single_cycle (6+nunber of lines in LOGIC)
+0d13
 b r7
 ;;; LOOP END
 

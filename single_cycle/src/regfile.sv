@@ -6,6 +6,11 @@ module regfile(
   output logic [15:0] rr1, rr2
 );
   logic [15:0] rf[15:0];
+  // Initialize all register values to zero.
+  initial begin
+    for (int i=0;i<16;i++)
+      rf[i] <= 0;
+  end
   // three ported register file
   // read two ports combinationally
   // write third port on rising edge of clk

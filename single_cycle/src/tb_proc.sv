@@ -3,10 +3,10 @@ module testbench();
 
   top dut (clk, rst, is_halt);
 
-  initial begin
-    #500;
-    $finish;
-  end
+  // initial begin
+  //   #500;
+  //   $finish;
+  // end
 
   initial begin
     clk <= 0;
