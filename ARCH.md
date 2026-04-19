@@ -16,7 +16,6 @@ Every program that is loaded is stored from `0xFFFF` and grows downwards.
 All the data that can be stored starts from `0x0000` and grows upwards.
 Following this, we don't implement a clear distinction between the two sections.
 
-<!-- Insert image here -->
 ```mermaid
 
 ---
@@ -44,8 +43,8 @@ packet
 
 It is made with the intention to give complete control over the 128kB to the programmer.
 The programmer can thus make programs that overwrite the program itself, as it can
-access any memory location. All the registers are writable, including vital ones like
-PC(program counter), or even the `zero` register!!
+access any memory location. 
+
 
 ## Registers and Encoding
 
@@ -92,7 +91,7 @@ Whenever immediates are included, they are placed on a separate line. A common i
 would look like this:
 ```asm
 addi r1, r2,
-49
+0d-49
 
 ; OR
 addi r1, r2,
@@ -130,6 +129,7 @@ packet
 ## Instruction Set
 
 Here is the instruction set implemented. 
+It is case-sensitive, but not space/comma sensitive.
 
 | Opcode | Instruction | Explanation |
 | :----: | :---------- | :---------- |
