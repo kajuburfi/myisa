@@ -1,7 +1,8 @@
 module testbench();
-  logic clk, rst, is_halt;
+  logic clk, rst;
+  logic [2:0] ctrl_syscall;
 
-  top dut (clk, rst, is_halt);
+  top dut (clk, rst, ctrl_syscall);
 
   // initial begin
   //   #500;
@@ -17,7 +18,7 @@ module testbench();
 
   always begin
     #5; clk = ~clk;
-    if (is_halt == 1)
+    if (ctrl_syscall == 3'b111)
       $finish;
   end
 endmodule

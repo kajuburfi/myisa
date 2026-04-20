@@ -31,6 +31,23 @@ module mux
   end
 endmodule
 
+module dmux
+  #(parameter WIDTH = 16)
+  (
+    input logic [WIDTH-1:0] inp,
+    input logic s,
+    output logic [WIDTH-1:0] y0, y1
+  );
+  always_comb begin
+    if (s==0)
+      y0 = inp;
+    else if (s==1)
+      y1 = inp;
+    else
+      y0 = inp;
+  end
+endmodule
+
 
 module sub1
   #(parameter WIDTH = 16)
