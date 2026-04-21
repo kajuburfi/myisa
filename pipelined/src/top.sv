@@ -3,35 +3,90 @@ module top(
   output logic [2:0] ctrl_syscall
 );
   // Internal wires
-  logic [15:0] pcm1, pcm2, pcnext, pcnew, pc, instr,
-          imm, rr1, rr2, srcA, srcB, aluout, rm, wd;
+  logic [15:0] pcm1, pcm2, pcnext, pcnew, 
+          srcA, srcB, wd;
   logic [3:0] a1_in;
+  // Internal wires with stage presence
+  logic [15:0] pcF, instrF, immF, aluout;
+  logic [15:0] pcD, instrD, immD, rr1D, rr2D;
+  logic [15:0] pcE, instrE, immE, rr1E, rr2E, aluoutE;
+  logic [15:0] instrM, rr1M, aluoutM, rmM;
+  logic [15:0] instrW, aluoutW, rmW;
   // Ctrl signals
-  logic is_imm, is_rwe, is_mwe, is_rd, is_memout, is_b, is_pc_reg;
-  logic [2:0] ctrl_alu;
-  logic [1:0] ctrl_b;
-  
+  logic is_b;
+  logic is_immF, is_rweF, is_mweF, is_rdF, is_memoutF, is_pc_regF;
+  logic [2:0] ctrl_aluF, ctrl_syscallF;
+  logic [1:0] ctrl_bF;
+  logic is_immD, is_rweD, is_mweD, is_rdD, is_memoutD, is_pc_regD;
+  logic [2:0] ctrl_aluD, ctrl_syscallD;
+  logic [1:0] ctrl_bD;
+  logic is_immE, is_rweE, is_mweE, is_memoutE, is_pc_regE;
+  logic [2:0] ctrl_aluE, ctrl_syscallE;
+  logic is_rweM, is_mweM, is_memoutM;
+  logic [2:0] ctrl_syscallM;
+  logic is_rweW, is_memoutW;
+  logic [2:0] ctrl_syscallW; // This is ctrl_syscall output signal
+
   // Modules and their connections.
   sub1 sub1_1(pcm1, pcm2);
-  mux mux_pc1(pcm1, pcm2, is_imm, pcnext);
-  mux mux_pc2(pcnext, rr2, is_b, pcnew);
-  dff #(16, 16'd255) dff_pc(clk, rst, pcnew, pc);
-  sub1 sub1_2(pc, pcm1);
+  mux mux_pc1(pcm1, pcm2, is_immF, pcnext);
+  mux mux_pc2(pcnext, rr2D, is_b, pcnew);
+  dff #(16, 16'd255) dff_pc(clk, rst, pcnew, pcF);
+  sub1 sub1_2(pcF, pcm1);
 
-  imem imem_module(pc, pcm1, instr, imm);
-  ctrl_unit ctrl_unit_module(instr, is_imm, is_rwe, is_mwe, is_memout, is_rd, is_pc_reg, ctrl_syscall, ctrl_alu, ctrl_b);
+  imem imem_module(pcF, pcm1, instrF, immF);
+  ctrl_unit ctrl_unit_module(instrF, is_immF, is_rweF, is_mweF, is_memoutF, is_rdF, is_pc_regF, ctrl_syscallF, ctrl_aluF, ctrl_bF);
 
-  mux #(4) mux_instr(instr[3:0], instr[11:8], is_rd, a1_in);
+  fd_pr fd_pr(clk,
+    is_immF, is_rdF, is_rweF, is_pc_regF, is_mweF, is_memoutF,
+    ctrl_aluF, ctrl_syscallF,
+    ctrl_bF,
+    pcF, instrF, immF,
+    is_immD, is_rdD, is_rweD, is_pc_regD, is_mweD, is_memoutD,
+    ctrl_aluD, ctrl_syscallD,
+    ctrl_bD,
+    pcD, instrD, immD
+  );
 
-  regfile rf_module(clk, is_rwe, a1_in, instr[7:4], instr[11:8], wd, rr1, rr2);
+  mux #(4) mux_instr(instrD[3:0], instrD[11:8], is_rdD, a1_in);
 
-  b_box b_box_module(rr1[1:0], ctrl_b, is_b);
-  mux mux_pc_rr2(rr2, pc, is_pc_reg, srcA);
-  mux mux_imm_rr1(rr1, imm, is_imm, srcB);
+  regfile rf_module(clk, is_rweW, a1_in, instrD[7:4], instrW[11:8], wd, rr1D, rr2D);
+
+  b_box b_box_module(rr1D[1:0], ctrl_bD, is_b);
+
+  de_pr de_pr(clk,
+  is_immD, is_rweD, is_pc_regD, is_mweD, is_memoutD,
+  ctrl_aluD, ctrl_syscallD,
+  pcD, rr2D, rr1D, immD, instrD,
+  is_immE, is_rweE, is_pc_regE, is_mweE, is_memoutE,
+  ctrl_aluE, ctrl_syscallE,
+  pcE, rr2E, rr1E, immE, instrE
+  );
+
+  mux mux_pc_rr2(rr2E, pcE, is_pc_regE, srcA);
+  mux mux_imm_rr1(rr1E, immE, is_immE, srcB);
   
-  alu alu_module(srcA, srcB, ctrl_alu, aluout);
+  alu alu_module(srcA, srcB, ctrl_aluE, aluoutE);
 
-  dmem dmem_module(clk, is_mwe, aluout, rr1, rm);
+  em_pr em_pr(clk,
+  is_rweE, is_mweE, is_memoutE,
+  ctrl_syscallE,
+  aluoutE, rr1E, instrE,
+  is_rweM, is_mweM, is_memoutM,
+  ctrl_syscallM,
+  aluoutM, rr1M, instrM
+  );
 
-  mux mux_aluout_rm(aluout, rm, is_memout, wd);
+  dmem dmem_module(clk, is_mweM, aluoutM, rr1M, rmM);
+
+  mw_pr mw_pr(clk,
+  is_rweM, is_memoutM,
+  ctrl_syscallM,
+  aluoutM, rmM, instrM,
+  is_rweW, is_memoutW,
+  ctrl_syscall,
+  aluoutW, rmW, instrW
+  );
+
+  mux mux_aluout_rm(aluoutW, rmW, is_memoutW, wd);
 endmodule

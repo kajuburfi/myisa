@@ -11,7 +11,7 @@ module testbench();
 
   initial begin
     clk <= 0;
-    rst <= 1; #5; rst <= 0;
+    rst <= 1; #15; rst <= 0;
     $dumpfile("dump.vcd");
     $dumpvars(0, testbench);
   end
