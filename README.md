@@ -6,6 +6,16 @@ For my design choices, I selected 16-bit architecture(for simplicity) and played
 having immediate values stored in a separate word. Hence, I make full utilization of the 16 bits per word.
 This has primarily been inspired from MIPS, IAS and RISC V ISAs.
 
+## Diagrams
+
+#### Single Cycle
+
+![Single Cycle](./single_cycle/myisa_single_cycle.svg)
+
+#### Pipelined Basic(Without hazard detection)
+
+![Basic Pipeline](./pipelined/myisa_pipelined_basic.svg)
+
 ## ISA
 The specifcations of the ISA can be found in the [Architecture](./ARCH.md) file. Please refer that.
 Here is a table with all the instructions implemented.
