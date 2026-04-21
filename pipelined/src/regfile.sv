@@ -17,7 +17,7 @@ module regfile(
   // register zero(which is 15) hardwired to 0
   // note: for pipelined processor, write third port
   // on falling edge of clk
-  always_ff @(posedge clk) begin
+  always_ff @(negedge clk) begin
     if (rwe) rf[a3] <= wd;
   end
   assign rr1 = (a1 != 15) ? rf[a1] : 0;
