@@ -9,12 +9,19 @@ This has primarily been inspired from MIPS, IAS and RISC V ISAs.
 ## Diagrams
 
 #### Single Cycle
+![Single Cycle](./single_cycle/myisa_single_cycle.png)
 
-![Single Cycle](./single_cycle/myisa_single_cycle.svg)
+#### Basic Pipeline(no hazards fix)
+![Basic pipeline](./pipelined/diagrams/myisa_pipelined_basic.png)
 
-#### Pipelined Basic(Without hazard detection)
+#### Pipeline with forwarding
+![Pipeline with forwarding](./pipelined/diagrams/myisa_pipelined_fwd.png)
 
-![Basic Pipeline](./pipelined/myisa_pipelined_basic.svg)
+#### Pipeline with forwarding and stalls
+![Pipeline with fwd and stalls](./pipelined/diagrams/myisa_pipelined_stall.png)
+
+#### Pipeline with forwarding, stalls and control hazard fix
+![Pipeline with ctrl fix](./pipelined/diagrams/myisa_pipelined_ctrl.png)
 
 ## ISA
 The specifcations of the ISA can be found in the [Architecture](./ARCH.md) file. Please refer that.
