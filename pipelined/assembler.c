@@ -1,5 +1,4 @@
 /* Changes made compared to c_impl:
- - Write to file in readable format(text file) for use in $readmemh() in
  - SystemVerilog Change Instruction storage format for cmp and branch instr to
    have flg register as rd
  */
@@ -235,9 +234,10 @@ int main(int argc, char *argv[]) {
     }
 
     // NOTE: If it is an immediate value, then the value of `is_instr` will be
-    // zero, since we change it after the imm portion. So, we use that to check
+    // 1, since we change it after the imm portion. So, we use that to check
     // if the instruction[] contains an instruction or an immediate value.
-    if (!is_instr) {
+    if (!is_instr) { // Sounds weird, but this is just because we count down for
+                     // register vs instructions and all
       // Doing this because the minimum size of data is 1 byte, but I need 4
       // bits of info here.
       char final_instr[2];
