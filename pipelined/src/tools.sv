@@ -2,13 +2,15 @@ module dff
   #(parameter WIDTH = 16,
     parameter RST_VAL = 0)
   (
-    input logic clk, rst,
+    input logic clk, en, rst,
     input logic [WIDTH-1:0] d,
     output logic [WIDTH-1:0] q
   );
   always_ff @(posedge clk, posedge rst) begin
-    if (rst) q <= RST_VAL;
-    else q <= d;
+    if (rst)
+      q <= RST_VAL;
+    else if (en)
+      q <= d;
   end
 endmodule
 

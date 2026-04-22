@@ -1,10 +1,15 @@
 module hazard_unit(
+  // RAW (fwd)
   // ctrl signals
   input logic is_rweM, is_rweW,
   //wires
   input logic [3:0] a1_in, a2_in, instrM, instrW,
   //output signals
-  output logic [1:0] fwdaE, fwdbE
+  output logic [1:0] fwdaE, fwdbE,
+  // STALL
+  input logic is_memoutE,
+  input logic [3:0] instrE_dst, instrD_s1, instrD_s2,
+  output logic flushE, stallF, stallD
 );
   // For RAW Hazards ONLY - Simple forwarding
   always_comb begin
@@ -22,5 +27,18 @@ module hazard_unit(
       fwdbE = 2'b01;
     else
       fwdbE = 2'b00;
+  end
+
+  // Stalling for lw instruction
+  always_comb begin
+    if ( ((instrD_s1 == instrE_dst) || (instrD_s2 == instrE_dst)) && is_memoutE ) begin
+      stallF = 1;
+      stallD = 1;
+      flushE = 1;
+    end else begin
+      stallF = 0;
+      stallD = 0;
+      flushE = 0;
+    end
   end
 endmodule

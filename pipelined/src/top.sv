@@ -28,26 +28,32 @@ module top(
   logic [2:0] ctrl_syscallW; // This is ctrl_syscall output signal
   // Hazard signals
   logic [1:0] fwdaE, fwdbE;
+  logic flushE, stallF, stallD;
 
   // Modules and their connections.
 
   // Hazard unit
   hazard_unit hazard_unit(
+  // fwd
   is_rweM, is_rweW,
   (is_rdD ? instrE[11:8] : instrE[3:0]), instrE[7:4], instrM[11:8], instrW[11:8],
-  fwdaE, fwdbE
+  fwdaE, fwdbE,
+  // stall
+  is_memoutE,
+  instrE[11:8], (is_rdD?instrD[11:8]:instrD[3:0]), instrD[7:4],
+  flushE, stallF, stallD
   );
    
   sub1 sub1_1(pcm1, pcm2);
   mux mux_pc1(pcm1, pcm2, is_immF, pcnext);
   mux mux_pc2(pcnext, rr2D, is_b, pcnew);
-  dff #(16, 16'd255) dff_pc(clk, rst, pcnew, pcF);
+  dff #(16, 16'd255) dff_pc(clk, ~stallF, rst, pcnew, pcF);
   sub1 sub1_2(pcF, pcm1);
 
   imem imem_module(pcF, pcm1, instrF, immF);
   ctrl_unit ctrl_unit_module(instrF, is_immF, is_rweF, is_mweF, is_memoutF, is_rdF, is_pc_regF, ctrl_syscallF, ctrl_aluF, ctrl_bF);
 
-  fd_pr fd_pr(clk,
+  fd_pr fd_pr(clk, ~stallD,
     is_immF, is_rdF, is_rweF, is_pc_regF, is_mweF, is_memoutF,
     ctrl_aluF, ctrl_syscallF,
     ctrl_bF,
@@ -64,7 +70,7 @@ module top(
 
   b_box b_box_module(rr1D[1:0], ctrl_bD, is_b);
 
-  de_pr de_pr(clk,
+  de_pr de_pr(clk, flushE,
   is_immD, is_rweD, is_pc_regD, is_mweD, is_memoutD,
   ctrl_aluD, ctrl_syscallD,
   pcD, rr2D, rr1D, immD, instrD,
