@@ -2,6 +2,7 @@
  - SystemVerilog Change Instruction storage format for cmp and branch instr to
    have flg register as rd
  */
+// vim: set filetype=systemverilog:
 #include <stdio.h>
 #include <string.h>
 
