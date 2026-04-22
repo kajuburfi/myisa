@@ -9,7 +9,9 @@ module hazard_unit(
   // STALL
   input logic is_memoutE,
   input logic [3:0] instrE_dst, instrD_s1, instrD_s2,
-  output logic flushE, stallF, stallD
+  output logic flushE, stallF, stallD,
+  // CTRL
+  output logic fwdrr1D
 );
   // For RAW Hazards ONLY - Simple forwarding
   always_comb begin
@@ -39,6 +41,14 @@ module hazard_unit(
       stallF = 0;
       stallD = 0;
       flushE = 0;
+    end
+  end
+
+  always_comb begin
+    if ((instrD_s1!=15) && (instrD_s1 == instrM) && is_rweM) begin
+      fwdrr1D = 1; 
+    end else begin
+      fwdrr1D = 0;
     end
   end
 endmodule
