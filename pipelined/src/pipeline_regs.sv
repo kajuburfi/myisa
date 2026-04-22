@@ -1,5 +1,5 @@
 module fd_pr(
-  input logic clk, en,
+  input logic clk, en, rst,
   input logic is_imm_old, is_rd_old, is_rwe_old, is_pc_reg_old, is_mwe_old, is_memout_old,
   input logic [2:0] ctrl_alu_old, ctrl_syscall_old,
   input logic [1:0] ctrl_b_old,
@@ -10,7 +10,20 @@ module fd_pr(
   output logic [15:0] pc, instr, imm
 );
   always_ff @(posedge clk) begin
-    if (en) begin
+    if (rst) begin
+      is_imm <= 0;
+      is_rd <= 0;
+      is_rwe <= 0;
+      is_pc_reg <= 0;
+      is_mwe <= 0;
+      is_memout <= 0;
+      ctrl_syscall <= 0;
+      ctrl_alu <= 0;
+      ctrl_b <= 0;
+      pc <= 0;
+      instr <= 0;
+      imm <= 0;
+    end else if (en) begin
       is_imm <= is_imm_old;
       is_rd <= is_rd_old;
       is_rwe <= is_rwe_old;

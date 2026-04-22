@@ -44,6 +44,7 @@ module top(
   instrE[11:8], (is_rdD?instrD[11:8]:instrD[3:0]), instrD[7:4],
   flushE, stallF, stallD,
   // ctrl
+  (ctrl_bD[0] + ctrl_bD[1]), is_memoutM, is_rweE,
   instrD[15:12],
   fwdrr1D
   );
@@ -57,7 +58,7 @@ module top(
   imem imem_module(pcF, pcm1, instrF, immF);
   ctrl_unit ctrl_unit_module(instrF, is_immF, is_rweF, is_mweF, is_memoutF, is_rdF, is_pc_regF, ctrl_syscallF, ctrl_aluF, ctrl_bF);
 
-  fd_pr fd_pr(clk, ~stallD,
+  fd_pr fd_pr(clk, ~stallD, is_b,
     is_immF, is_rdF, is_rweF, is_pc_regF, is_mweF, is_memoutF,
     ctrl_aluF, ctrl_syscallF,
     ctrl_bF,

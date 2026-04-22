@@ -11,6 +11,7 @@ module hazard_unit(
   input logic [3:0] instrE_dst, instrD_s1, instrD_s2,
   output logic flushE, stallF, stallD,
   // CTRL
+  input logic ctrl_b_not_zero, is_memoutM, is_rweE,
   input logic [3:0] instrD_op,
   output logic fwdrr1D
 );
@@ -34,7 +35,10 @@ module hazard_unit(
 
   // Stalling for lw instruction
   always_comb begin
-    if ( ((instrD_s1 == instrE_dst) || (instrD_s2 == instrE_dst)) && is_memoutE ) begin
+    if ( (((instrD_s1 == instrE_dst) || (instrD_s2 == instrE_dst)) && is_memoutE)
+      || ((ctrl_b_not_zero && is_rweE && (instrE_dst == instrD_s1 || instrE_dst == instrD_s2))
+         || (ctrl_b_not_zero && is_memoutM && (instrM_dst == instrD_s1 || instrM_dst == instrD_s2)))
+    ) begin
       stallF = 1;
       stallD = 1;
       flushE = 1;
