@@ -3,7 +3,7 @@ module hazard_unit(
   // ctrl signals
   input logic is_rweM, is_rweW,
   //wires
-  input logic [3:0] a1_in, a2_in, instrM, instrW,
+  input logic [3:0] a1_in, a2_in, instrM_dst, instrW_dst,
   //output signals
   output logic [1:0] fwdaE, fwdbE,
   // STALL
@@ -11,21 +11,22 @@ module hazard_unit(
   input logic [3:0] instrE_dst, instrD_s1, instrD_s2,
   output logic flushE, stallF, stallD,
   // CTRL
+  input logic [3:0] instrD_op,
   output logic fwdrr1D
 );
   // For RAW Hazards ONLY - Simple forwarding
   always_comb begin
     // For srcA
-    if ((a2_in != 15) && (a2_in == instrM) && is_rweM)
+    if ((a2_in != 15) && (a2_in == instrM_dst) && is_rweM)
       fwdaE = 2'b10;
-    else if ((a2_in != 15) && (a2_in == instrW) && is_rweW)
+    else if ((a2_in != 15) && (a2_in == instrW_dst) && is_rweW)
       fwdaE = 2'b01;
     else
       fwdaE = 2'b00;
     // For srcB
-    if ((a1_in != 15) && (a1_in == instrM) && is_rweM)
+    if ((a1_in != 15) && (a1_in == instrM_dst) && is_rweM)
       fwdbE = 2'b10;
-    else if ((a1_in != 15) && (a1_in == instrW) && is_rweW)
+    else if ((a1_in != 15) && (a1_in == instrW_dst) && is_rweW)
       fwdbE = 2'b01;
     else
       fwdbE = 2'b00;
@@ -45,7 +46,7 @@ module hazard_unit(
   end
 
   always_comb begin
-    if ((instrD_s1!=15) && (instrD_s1 == instrM) && is_rweM) begin
+    if ((instrD_s1!=15) && (instrD_s1 == instrM_dst) && is_rweM && (instrD_op == 10 || instrD_op == 11 || instrD_op == 12)) begin
       fwdrr1D = 1; 
     end else begin
       fwdrr1D = 0;

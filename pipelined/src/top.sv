@@ -44,6 +44,7 @@ module top(
   instrE[11:8], (is_rdD?instrD[11:8]:instrD[3:0]), instrD[7:4],
   flushE, stallF, stallD,
   // ctrl
+  instrD[15:12],
   fwdrr1D
   );
    
