@@ -1,0 +1,3 @@
+./pipelined/assembler.c -linguist-detectable
+./single_cycle/assembler.c -linguist-detectable
+
