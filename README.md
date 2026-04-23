@@ -51,7 +51,8 @@ As of writing this README, I've implemented this ISA through [C code](./c_impl) 
 I'm currently working on making this pipelined, with some _advanced_ microarchitectural principles as well(like branch predictor, superscalar,
 out of order execuction, etc).
 
-## Sources
+## References
 - [Harris and Harris: **Digital Design and Computer Architecture**](https://unidel.edu.ng/focelibrary/books/Digital%20Design%20and%20Computer%20Architecture%20(Harris,%20Sarah,%20Harris,%20David)%20(Z-Library).pdf)(2<sup>nd</sup> edition)
 - [Henessay and Patterson: **Computer Architecture: A Quantitative Approach**](https://www.eng.biu.ac.il/~wimers/files/courses/Computer_Structure_and_Architecture/Books/Hennessy%20%20Patterson%204th%20Eddition.pdf)(4<sup>th</sup> edition)
 - [Shen and Lipasti: **Modern Processor Design: Fundamentals of Superscalar Processors**](https://acs.pub.ro/~cpop/SMPA/Modern%20Processor%20Design_%20Fundamentals%20of%20Superscalar%20Processors%20(%20PDFDrive%20).pdf)
+- [Weste and Harris: **CMOS VLSI Design: A Circuits and Systems Perspective**](https://vlsiworlds.com/wp-content/uploads/2021/04/cmos-vlsi-design-by-weste.pdf)
