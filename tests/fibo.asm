@@ -2,7 +2,7 @@
 
 ; r0 contains the max value we want to go till 
 addi r0, zero,
-0d15
+0d10
 
 ; r1 and r2 will be repeatedly added together to get the new values of fibonacci
 addi r1, zero,
@@ -21,7 +21,7 @@ cmp r9, r0
 ; Break out of loop condition
 addi r8, pc,
 ;; This value must be (6+number of lines in LOGIC)
-0d-13
+0d-15
 bgt r8
 
 ;; Logic in loop
@@ -47,6 +47,13 @@ addi r7, pc,
 ;; - In single_cycle (6+nunber of lines in LOGIC)
 0d13
 b r7
+nop
+nop
+nop
+nop
+nop
+nop
+
 ;;; LOOP END
 
 ;;; Below is an example of a basic `for` loop

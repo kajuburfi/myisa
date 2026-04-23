@@ -4,7 +4,7 @@ module top(
 );
   // Internal wires
   logic [15:0] pcm1, pcm2, pcnext, pcnew,  
-          Hrr2, srcA, srcB, wd, rr1out;
+          Hrr2, srcA, srcB, wd, rr1out, rr2out;
   logic [3:0] a1_in;
   // Internal wires with stage presence
   logic [15:0] pcF, instrF, immF, aluout;
@@ -29,7 +29,7 @@ module top(
   // Hazard signals
   logic [1:0] fwdaE, fwdbE;
   logic flushE, stallF, stallD;
-  logic fwdrr1D;
+  logic fwdrr1D, fwdrr2D;
 
   // Modules and their connections.
 
@@ -46,7 +46,7 @@ module top(
   // ctrl
   (ctrl_bD[0] + ctrl_bD[1]), is_memoutM, is_rweE,
   instrD[15:12],
-  fwdrr1D
+  fwdrr1D, fwdrr2D
   );
    
   sub1 sub1_1(pcm1, pcm2);
@@ -71,9 +71,10 @@ module top(
 
   mux #(4) mux_instr(instrD[3:0], instrD[11:8], is_rdD, a1_in);
 
-  regfile rf_module(clk, is_rweW, a1_in, instrD[7:4], instrW[11:8], wd, rr1out, rr2D);
+  regfile rf_module(clk, is_rweW, a1_in, instrD[7:4], instrW[11:8], wd, rr1out, rr2out);
 
-  mux mux_after_rf(rr1out, aluoutM, fwdrr1D, rr1D);
+  mux mux_after_rf1(rr1out, aluoutE, fwdrr1D, rr1D);
+  mux mux_after_rf2(rr2out, aluoutE, fwdrr2D, rr2D);
 
   b_box b_box_module(rr1D[1:0], ctrl_bD, is_b);
 
