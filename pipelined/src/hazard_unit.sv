@@ -11,9 +11,9 @@ module hazard_unit(
   input logic [3:0] instrE_dst, instrD_s1, instrD_s2,
   output logic flushE, stallF, stallD,
   // CTRL
-  input logic ctrl_b_not_zero, is_memoutM, is_rweE,
+  input logic ctrl_b_not_zero, is_memoutM, is_rweE, is_b,
   input logic [3:0] instrD_op,
-  output logic fwdrr1D, fwdrr2D
+  output logic [1:0] fwdrr1D, fwdrr2D
 );
   // For RAW Hazards ONLY - Simple forwarding
   always_comb begin
@@ -36,8 +36,8 @@ module hazard_unit(
   // Stalling for lw instruction
   always_comb begin
     if ( (((instrD_s1 == instrE_dst) || (instrD_s2 == instrE_dst)) && is_memoutE)
-      || ((ctrl_b_not_zero && is_rweE && (instrE_dst == instrD_s1 || instrE_dst == instrD_s2))
-         || (ctrl_b_not_zero && is_memoutM && (instrM_dst == instrD_s1 || instrM_dst == instrD_s2)))
+      || ((ctrl_b_not_zero && is_rweE && (instrE_dst == instrD_s1 || instrE_dst == instrD_s2) && ~is_b)
+         || (ctrl_b_not_zero && is_memoutM && (instrM_dst == instrD_s1 || instrM_dst == instrD_s2) && ~is_b))
     ) begin
       stallF = 1;
       stallD = 1;
@@ -50,15 +50,19 @@ module hazard_unit(
   end
 
   always_comb begin
-    if ((instrD_s1!=15) && (instrD_s1 == instrE_dst) && is_rweE) begin
-      fwdrr1D = 1; 
+    if ((instrD_s1!=15) && (instrD_s1 == instrM_dst) && is_rweM) begin
+      fwdrr1D = 2'b01;
+    end else if ((instrD_s1!=15) && (instrD_s1 == instrE_dst) && is_rweE) begin
+      fwdrr1D = 2'b10;
     end else begin
-      fwdrr1D = 0;
+      fwdrr1D = 2'b00;
     end
-    if ((instrD_s2!=15) && (instrD_s2 == instrE_dst) && is_rweE) begin
-      fwdrr2D = 1;
+    if ((instrD_s2!=15) && (instrD_s2 == instrM_dst) && is_rweM) begin
+      fwdrr2D = 2'b01;
+    end else if ((instrD_s2!=15) && (instrD_s2 == instrE_dst) && is_rweE) begin
+      fwdrr2D = 2'b10;
     end else begin
-      fwdrr2D = 0;
+      fwdrr2D = 2'b00;
     end
   end
 endmodule

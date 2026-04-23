@@ -48,11 +48,6 @@ addi r7, pc,
 0d13
 b r7
 nop
-nop
-nop
-nop
-nop
-nop
 
 ;;; LOOP END
 

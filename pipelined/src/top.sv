@@ -29,7 +29,7 @@ module top(
   // Hazard signals
   logic [1:0] fwdaE, fwdbE;
   logic flushE, stallF, stallD;
-  logic fwdrr1D, fwdrr2D;
+  logic [1:0] fwdrr1D, fwdrr2D;
 
   // Modules and their connections.
 
@@ -44,7 +44,7 @@ module top(
   instrE[11:8], (is_rdD?instrD[11:8]:instrD[3:0]), instrD[7:4],
   flushE, stallF, stallD,
   // ctrl
-  (ctrl_bD[0] + ctrl_bD[1]), is_memoutM, is_rweE,
+  (ctrl_bD[0] + ctrl_bD[1]), is_memoutM, is_rweE, is_b,
   instrD[15:12],
   fwdrr1D, fwdrr2D
   );
@@ -73,8 +73,8 @@ module top(
 
   regfile rf_module(clk, is_rweW, a1_in, instrD[7:4], instrW[11:8], wd, rr1out, rr2out);
 
-  mux mux_after_rf1(rr1out, aluoutE, fwdrr1D, rr1D);
-  mux mux_after_rf2(rr2out, aluoutE, fwdrr2D, rr2D);
+  mux3 mux_after_rf1(rr1out, aluoutM, aluoutE, fwdrr1D, rr1D);
+  mux3 mux_after_rf2(rr2out, aluoutM, aluoutE, fwdrr2D, rr2D);
 
   b_box b_box_module(rr1D[1:0], ctrl_bD, is_b);
 
