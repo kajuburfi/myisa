@@ -157,11 +157,10 @@ endmodule
 
 
 module mainMemory (
-  input  wire        clk,
-  input  wire        we,
-  input  wire [15:0] addr,
-  input  wire [15:0] din,
-  output reg [15:0]  dout
+  input logic clk, mwe,
+  input logic [15:0] waddr, wdata,
+  input logic [15:0] a1, a2,
+  output logic [15:0]  d1, d2
 );
   // File parameters
   localparam FNAME = "mem.hex";
@@ -210,7 +209,7 @@ module mainMemory (
   function [15:0] file_read_hex_word(input integer a);
     integer okseek;
     integer c0, c1, c2, c3, nl;
-    reg [3:0] n0, n1, n2, n3;
+    logic [3:0] n0, n1, n2, n3;
     begin
       file_read_hex_word = 16'h0000;
       okseek = seek_line(a);
@@ -234,7 +233,7 @@ module mainMemory (
   // write 16-bit word as 4 hex chars + newline in-place at address a
   task file_write_hex_word(input integer a, input [15:0] v);
     integer okseek;
-    reg [7:0] c0, c1, c2, c3;
+    logic [7:0] c0, c1, c2, c3;
     begin
       okseek = seek_line(a);
       if (okseek != 0) begin
@@ -251,11 +250,13 @@ module mainMemory (
     end
   endtask
 
-  // Synchronous: write then read 
+  // Sync write
   always @(posedge clk) begin
-    if (we) file_write_hex_word(addr, din);
+    if (mwe) file_write_hex_word(waddr, wdata);
   end
-  assign dout = file_read_hex_word(addr);
+  // Async read 
+  assign d1 = file_read_hex_word(a1);
+  assign d2 = file_read_hex_word(a2);
 
   final begin
     if (fh != 0) $fclose(fh);
@@ -267,19 +268,21 @@ endmodule
 // // small sanity testbench (assumes mem.hex exists)
 // module tb;
 //   reg clk = 0; always #5 clk = ~clk;
-//   reg we; reg [15:0] addr; reg [15:0] din; wire [15:0] dout;
-//   mainMemory uut(.clk(clk), .we(we), .addr(addr), .din(din), .dout(dout));
+//   logic mwe = 0;
+//   logic [15:0] waddr, wdata, a1, a2, d1, d2;
+//   mainMemory uut(clk, mwe, waddr, wdata, a1, a2, d1, d2);
 
 //   initial begin
 //     // write to addr 1, read back
-//     we = 1; addr = 16'd5000; din = 16'hABCD; #10;
-//     we = 0; addr = 16'd5000; #10;
-//     $display("Read addr 1 = %04h", dout);
+//     mwe = 1; waddr = 16'd5000; wdata = 16'hABCD; #10;
+//     mwe = 0; a1 = 16'd5000; #10; a2 = 16'd5001; #10;
+//     $display("Read addr 1 = %04h", d1);
+//     $display("Read addr 2 = %04h", d2);
 
-//     // write to last addr, read back
-//     we = 1; addr = 16'd65535; din = 16'h55AA; #10;
-//     we = 0; addr = 16'd65535; #10;
-//     $display("Read addr 65535 = %04h", dout);
+//     // // write to last addr, read back
+//     // mwe = 1; waddr = 16'd65535; din = 16'h55AA; #10;
+//     // mwe = 0; waddr = 16'd65535; #10;
+//     // $display("Read addr 65535 = %04h", dout);
 
 //     $finish;
 //   end
