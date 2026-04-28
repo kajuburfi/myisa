@@ -217,7 +217,7 @@ module mainMemory (
         $display("fseek read error at addr %0d", a);
       end else begin
         c0 = $fgetc(fh); c1 = $fgetc(fh); c2 = $fgetc(fh); c3 = $fgetc(fh); nl = $fgetc(fh);
-        if (c0 === -1 || c1 === -1 || c2 === -1 || c3 === -1) begin
+        if (c0 == -1 || c1 == -1 || c2 == -1 || c3 == -1) begin
           file_read_hex_word = 16'h0000;
         end else begin
           n0 = ascii_to_nibble(c0[7:0]);
@@ -234,6 +234,7 @@ module mainMemory (
   task file_write_hex_word(input integer a, input [15:0] v);
     integer okseek;
     logic [7:0] c0, c1, c2, c3;
+    integer temp0, temp1, temp2, temp3, temp4; // for the return values of fputc
     begin
       okseek = seek_line(a);
       if (okseek != 0) begin
@@ -244,7 +245,11 @@ module mainMemory (
         c2 = nibble_to_ascii(v[7:4]);
         c3 = nibble_to_ascii(v[3:0]);
         // overwrite 4 chars + newline (keep newline as '\n')
-        $fputc(c0, fh); $fputc(c1, fh); $fputc(c2, fh); $fputc(c3, fh); $fputc(8'h0A, fh);
+        temp0 = $fputc(c0, fh);
+        temp1 = $fputc(c1, fh);
+        temp2 = $fputc(c2, fh);
+        temp3 = $fputc(c3, fh);
+        temp4 = $fputc(8'h0A, fh);
         $fflush(fh);
       end
     end

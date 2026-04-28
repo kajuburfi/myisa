@@ -47,6 +47,6 @@ module imem(
   end
   */
 
-  mainMemory mem(1'b0, 1'b0, 16'b0, 16'b0, a1, a2, ri1, ri2);
+  mainMemory imem(1'b0, 1'b0, 16'b0, 16'b0, a1, a2, ri1, ri2);
 endmodule
 
