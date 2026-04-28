@@ -8,4 +8,4 @@ tests/a.asm
 **assembler
 **output.bin
 **.excalidraw
-mem.hex
+**mem.hex
