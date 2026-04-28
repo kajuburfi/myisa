@@ -11,6 +11,8 @@ module imem(
   //   $readmemh("instr.dat", RAM);
   // end
 
+
+  /*
   int fd, code;
   int start = 0; // Start index
   int count = 255; // Maximum memory index to read
@@ -43,10 +45,8 @@ module imem(
     
     $fclose(fd);
   end
+  */
 
-  always_comb begin
-    ri1 = RAM[a1]; // word aligned
-    ri2 = RAM[a2];
-  end 
+  mainMemory mem(1'b0, 1'b0, 16'b0, 16'b0, a1, a2, ri1, ri2);
 endmodule
 

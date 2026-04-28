@@ -52,7 +52,7 @@ module top(
   sub1 sub1_1(pcm1, pcm2);
   mux mux_pc1(pcm1, pcm2, is_immF, pcnext);
   mux mux_pc2(pcnext, rr2D, is_b, pcnew);
-  dff #(16, 16'd255) dff_pc(clk, ~stallF, rst, pcnew, pcF);
+  dff #(16, 16'hFFFF) dff_pc(clk, ~stallF, rst, pcnew, pcF);
   sub1 sub1_2(pcF, pcm1);
 
   imem imem_module(pcF, pcm1, instrF, immF);
