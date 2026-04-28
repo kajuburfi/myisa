@@ -262,7 +262,7 @@ int main(int argc, char *argv[]) {
   fprintf(fop, "FFFF\n");
 
   for (int i = 0; i < (65535 - num_instr); i++)
-    fprintf(fop, "xxxx\n");
+    fprintf(fop, "0000\n");
 
   fclose(fp);
   fclose(fop);

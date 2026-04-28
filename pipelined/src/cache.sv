@@ -1,3 +1,6 @@
+/*
+
+
 // All hardcoded... sorry!
 
 // Control cache hits and misses and write backs and all
@@ -121,6 +124,11 @@ endmodule
 module L2cache();
 endmodule
 
+*/
+
+/* This takes waay too much time to compile, perhaps because of the insanely
+   large array that it must remember dynamically
+
 module mainMemory(
   input logic clk, is_w, en,
   input logic [15:0] a, w,
@@ -145,3 +153,135 @@ module mainMemory(
     end
   end
 endmodule
+*/
+
+
+module mainMemory (
+  input  wire        clk,
+  input  wire        we,
+  input  wire [15:0] addr,
+  input  wire [15:0] din,
+  output reg [15:0]  dout
+);
+  // File parameters
+  localparam FNAME = "mem.hex";
+  localparam LINE_BYTES = 5; // 4 hex chars + '\n'
+  integer fh;
+  integer ok;
+  integer i;
+
+  // open existing mem.hex (must be pre-created with 65536 lines of 4 hex chars + newline)
+  initial begin
+    fh = $fopen(FNAME, "r+");
+    if (fh == 0) begin
+      $display("ERROR: %s not found or cannot open. Ensure file exists and has 65536 lines of 4 hex digits.", FNAME);
+      $finish;
+    end
+  end
+
+  // helper: hex nibble (0..15) -> ASCII code
+  function [7:0] nibble_to_ascii(input [3:0] n);
+    begin
+      if (n < 10) nibble_to_ascii = 8'h30 + n; // '0'..'9'
+      else nibble_to_ascii = 8'h41 + (n - 10); // 'A'..'F'
+    end
+  endfunction
+
+  // helper: ASCII hex char -> nibble (0..15), returns 0 on invalid
+  function [3:0] ascii_to_nibble(input [7:0] c);
+    begin
+      if (c >= "0" && c <= "9") ascii_to_nibble = c - "0";
+      else if (c >= "A" && c <= "F") ascii_to_nibble = c - "A" + 4'd10;
+      else if (c >= "a" && c <= "f") ascii_to_nibble = c - "a" + 4'd10;
+      else ascii_to_nibble = 4'd0;
+    end
+  endfunction
+
+  // seek to start of line for word address 'a'
+  function integer seek_line(input integer a);
+    integer byte_off;
+    begin
+      byte_off = a * LINE_BYTES;
+      seek_line = $fseek(fh, byte_off, 0); // returns 0 on success in iverilog
+    end
+  endfunction
+
+  // read 16-bit word from hex file at address a
+  function [15:0] file_read_hex_word(input integer a);
+    integer okseek;
+    integer c0, c1, c2, c3, nl;
+    reg [3:0] n0, n1, n2, n3;
+    begin
+      file_read_hex_word = 16'h0000;
+      okseek = seek_line(a);
+      if (okseek != 0) begin
+        $display("fseek read error at addr %0d", a);
+      end else begin
+        c0 = $fgetc(fh); c1 = $fgetc(fh); c2 = $fgetc(fh); c3 = $fgetc(fh); nl = $fgetc(fh);
+        if (c0 === -1 || c1 === -1 || c2 === -1 || c3 === -1) begin
+          file_read_hex_word = 16'h0000;
+        end else begin
+          n0 = ascii_to_nibble(c0[7:0]);
+          n1 = ascii_to_nibble(c1[7:0]);
+          n2 = ascii_to_nibble(c2[7:0]);
+          n3 = ascii_to_nibble(c3[7:0]);
+          file_read_hex_word = {n0, n1, n2, n3}; // concatenates nibbles -> 16 bits
+        end
+      end
+    end
+  endfunction
+
+  // write 16-bit word as 4 hex chars + newline in-place at address a
+  task file_write_hex_word(input integer a, input [15:0] v);
+    integer okseek;
+    reg [7:0] c0, c1, c2, c3;
+    begin
+      okseek = seek_line(a);
+      if (okseek != 0) begin
+        $display("fseek write error at addr %0d", a);
+      end else begin
+        c0 = nibble_to_ascii(v[15:12]);
+        c1 = nibble_to_ascii(v[11:8]);
+        c2 = nibble_to_ascii(v[7:4]);
+        c3 = nibble_to_ascii(v[3:0]);
+        // overwrite 4 chars + newline (keep newline as '\n')
+        $fputc(c0, fh); $fputc(c1, fh); $fputc(c2, fh); $fputc(c3, fh); $fputc(8'h0A, fh);
+        $fflush(fh);
+      end
+    end
+  endtask
+
+  // Synchronous: write then read 
+  always @(posedge clk) begin
+    if (we) file_write_hex_word(addr, din);
+  end
+  assign dout = file_read_hex_word(addr);
+
+  final begin
+    if (fh != 0) $fclose(fh);
+  end
+endmodule
+
+
+// WORKS!!!!!!
+// // small sanity testbench (assumes mem.hex exists)
+// module tb;
+//   reg clk = 0; always #5 clk = ~clk;
+//   reg we; reg [15:0] addr; reg [15:0] din; wire [15:0] dout;
+//   mainMemory uut(.clk(clk), .we(we), .addr(addr), .din(din), .dout(dout));
+
+//   initial begin
+//     // write to addr 1, read back
+//     we = 1; addr = 16'd5000; din = 16'hABCD; #10;
+//     we = 0; addr = 16'd5000; #10;
+//     $display("Read addr 1 = %04h", dout);
+
+//     // write to last addr, read back
+//     we = 1; addr = 16'd65535; din = 16'h55AA; #10;
+//     we = 0; addr = 16'd65535; #10;
+//     $display("Read addr 65535 = %04h", dout);
+
+//     $finish;
+//   end
+// endmodule
+
