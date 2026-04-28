@@ -2,7 +2,9 @@
  - SystemVerilog Change Instruction storage format for cmp and branch instr to
    have flg register as rd
  */
+#include <bits/types.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // An enum for instructions
@@ -16,7 +18,7 @@ enum Instruction {
   addi,
   sub,
   mul,
-  div,
+  divi, // diff name here because "div" is already used in stdlib :(
   cmp,
   b,
   beq,
@@ -109,7 +111,7 @@ Instr str_to_instr(char *s) {
   if (strcmp(s, "mul") == 0)
     return mul;
   if (strcmp(s, "div") == 0)
-    return div;
+    return divi;
   if (strcmp(s, "cmp") == 0)
     return cmp;
   if (strcmp(s, "b") == 0)
@@ -153,13 +155,14 @@ int main(int argc, char *argv[]) {
 
   // Open both read and write files.
   FILE *fp = fopen(argv[1], "r");
-  FILE *fop = fopen("output.bin", "wb");
+  FILE *fop = fopen("mem_temp.hex", "w");
 
   if (fp == NULL || fop == NULL) {
     printf("Error: Cannot open file.");
     return 1;
   }
 
+  int num_instr = 0;
   char buf[256]; // This is to read a line of not more than 256 characters
   // The condition in the while iterates over every line in the file
   while (fgets(buf, sizeof(buf), fp) != NULL) {
@@ -243,16 +246,28 @@ int main(int argc, char *argv[]) {
       char final_instr[2];
       final_instr[0] = (instruction[0] << 4) + instruction[1];
       final_instr[1] = (instruction[2] << 4) + instruction[3];
-      fwrite(final_instr, sizeof(char), 2, fop);
+      // fwrite(final_instr, sizeof(char), 2, fop);
+      fprintf(fop, "%.2X%.2X\n", (unsigned int)(__uint8_t)final_instr[0],
+              (unsigned int)(__uint8_t)final_instr[1]);
+      num_instr++;
     } else {
-      fwrite(instruction, sizeof(char), 2, fop);
+      // fwrite(instruction, sizeof(char), 2, fop);
+      fprintf(fop, "%.2X%.2X\n", (unsigned int)(__uint8_t)instruction[0],
+              (unsigned int)(__uint8_t)instruction[1]);
+      num_instr++;
     }
   }
-  char halt_instr[2] = {0xFF, 0xFF};
-  fwrite(halt_instr, sizeof(char), 2, fop);
+  // char halt_instr[2] = {0xFF, 0xFF};
+  // fwrite(halt_instr, sizeof(char), 2, fop);
+  fprintf(fop, "FFFF\n");
+
+  for (int i = 0; i < (65535 - num_instr); i++)
+    fprintf(fop, "xxxx\n");
 
   fclose(fp);
   fclose(fop);
+
+  system("tac mem_temp.hex > mem.hex && rm mem_temp.hex");
   return 0;
 }
 
