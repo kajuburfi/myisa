@@ -84,3 +84,12 @@ module b_box
   );
   assign is_b = (ctrl_b[0] & ctrl_b[1]) | (ctrl_b[0] & flg[0]) | (ctrl_b[1] & flg[1]);
 endmodule
+
+module encoder_8_3(
+  input logic [7:0] inp,
+  output logic [2:0] y
+);
+  assign y[2] = inp[4] | inp[5] | inp[6] | inp[7];
+  assign y[1] = inp[2] | inp[3] | inp[6] | inp[7];
+  assign y[0] = inp[1] | inp[3] | inp[5] | inp[7];
+endmodule
