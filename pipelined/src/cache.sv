@@ -160,7 +160,7 @@ module mainMemory (
   input logic clk, mwe,
   input logic [15:0] waddr, wdata,
   input logic [15:0] a1, a2,
-  output logic [15:0]  d1, d2
+  output logic [15:0]  d1, d2, d3
 );
   // File parameters
   localparam FNAME = "mem.hex";
@@ -262,6 +262,7 @@ module mainMemory (
   // Async read 
   assign d1 = file_read_hex_word(a1);
   assign d2 = file_read_hex_word(a2);
+  assign d3 = file_read_hex_word(waddr); //Use this IFF ~mwe
 
   final begin
     if (fh != 0) $fclose(fh);

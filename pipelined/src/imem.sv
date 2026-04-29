@@ -47,6 +47,7 @@ module imem(
   end
   */
 
-  mainMemory imem(1'b0, 1'b0, 16'b0, 16'b0, a1, a2, ri1, ri2);
+  logic [15:0] temp; //useless
+  mainMemory imem(1'b0, 1'b0, 16'b0, 16'b0, a1, a2, ri1, ri2, temp);
 endmodule
 
