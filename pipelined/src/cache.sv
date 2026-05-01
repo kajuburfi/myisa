@@ -39,6 +39,12 @@ module MemoryController(
     C_w = mwe;
     M_w = 0;
     pause_mem_op = 0;
+    Mreq1 = 0;
+    Mreq2 = 0;
+    Mreq3 = 0;
+    need_l1C_write[0] = 0;
+    need_l1C_write[1] = 0;
+    need_l1C_write[2] = 0;
   end
 
   L1Cache l1_inst(
@@ -60,6 +66,10 @@ module MemoryController(
   );
 
   always_ff @(negedge clk) begin
+    $display("[%0t] need_l1C_write[0] = %0b", $time, need_l1C_write[0]);
+    $display("[%0t] need_l1C_write[1] = %0b", $time, need_l1C_write[1]);
+    $display("[%0t] need_l1C_write[2] = %0b", $time, need_l1C_write[2]);
+    $display("[%0t] pause_mem_op = %0b", $time, pause_mem_op);
     if (~pause_mem_op) begin
       // Send to L1Cache
       L1req1 <= req1;
@@ -72,17 +82,17 @@ module MemoryController(
 
       // If cache miss for a1; send to main memory
       if (~h1) begin
-        // $display("[%0t] MISS h1", $time); // DEBUG_HIGH
+      //   $display("[%0t] MISS h1", $time); // DEBUG_HIGH
         Mreq1 <= req1;
         Ma1 <= a1;
       end else if (h1) begin
-        // $display("[%0t] HIT  h1", $time); // DEBUG_HIGH
+      //   $display("[%0t] HIT  h1", $time); // DEBUG_HIGH
         d1 <= L1d1;
         Mreq1 <= 0;
       end
       // Take response of main mem
       if (Mreq1) begin
-        // $display("[%0t] Mreq1 == 1", $time); // DEBUG_HIGH
+      //   $display("[%0t] Mreq1 == 1", $time); // DEBUG_HIGH
 
         // Write to the buffer first
         l1C_write[0] <= {Ma1, Md1};
@@ -92,24 +102,24 @@ module MemoryController(
         // C_w <= 1;
         // is_mem <= 1;
       end else if (~Mreq1) begin
-        // $display("[%0t] Mreq1 == 0", $time); // DEBUG_HIGH
+      //   $display("[%0t] Mreq1 == 0", $time); // DEBUG_HIGH
         C_w <= 0;
         is_mem <= 0;
       end
 
       // If cache miss for a2; send to main memory
       if (~h2) begin
-        // $display("[%0t] MISS h2", $time); // DEBUG_HIGH
+      //   $display("[%0t] MISS h2", $time); // DEBUG_HIGH
         Mreq2 <= req2;
         Ma2 <= a2;
       end else if (h2) begin
-        // $display("[%0t] HIT  h2", $time); // DEBUG_HIGH
+      //   $display("[%0t] HIT  h2", $time); // DEBUG_HIGH
         d2 <= L1d2;
         Mreq2 <= 0;
       end
       // Take response of main mem
       if (Mreq2) begin
-        // $display("[%0t] Mreq2 == 1", $time); // DEBUG_HIGH
+      //   $display("[%0t] Mreq2 == 1", $time); // DEBUG_HIGH
         l1C_write[1] <= {Ma2, Md2};
         need_l1C_write[1] <= 1;
         // L1waddr <= Ma2;
@@ -117,24 +127,24 @@ module MemoryController(
         // C_w <= 1;
         // is_mem <= 1;
       end else if (~Mreq2) begin
-        // $display("[%0t] Mreq2 == 0", $time); // DEBUG_HIGH
+      //   $display("[%0t] Mreq2 == 0", $time); // DEBUG_HIGH
         C_w <= 0;
         is_mem <= 0;
       end
 
       // If cache miss for a3; send to main memory
       if (~h3) begin
-        // $display("[%0t] MISS h3", $time); // DEBUG_HIGH
+      //   $display("[%0t] MISS h3", $time); // DEBUG_HIGH
         Mreq3 <= req3;
         Mwaddr <= waddr;
       end else if (h3) begin
-        // $display("[%0t] HIT  h3", $time); // DEBUG_HIGH
+      //   $display("[%0t] HIT  h3", $time); // DEBUG_HIGH
         d3 <= L1d3;
         Mreq3 <= 0;
       end
       // Take response of main mem
       if (Mreq3) begin
-        // $display("[%0t] Mreq3 == 1", $time); // DEBUG_HIGH
+      //   $display("[%0t] Mreq3 == 1", $time); // DEBUG_HIGH
         l1C_write[2] <= {Mwaddr, Md3};
         need_l1C_write[2] <= 1;
         // L1waddr <= Mwaddr;
@@ -142,14 +152,14 @@ module MemoryController(
         // C_w <= 1;
         // is_mem <= 1;
       end else if (~Mreq3) begin
-        // $display("[%0t] Mreq3 == 0", $time); // DEBUG_HIGH
+      //   $display("[%0t] Mreq3 == 0", $time); // DEBUG_HIGH
         C_w <= 0;
         is_mem <= 0;
       end
 
       // Check for dirtyness
       if (is_dirty) begin
-        // $display("[%0t] Dirty", $time); // DEBUG_HIGH
+      //   $display("[%0t] Dirty", $time); // DEBUG_HIGH
         M_w <= 1;
         Mwaddr <= wb_addr;
         Mwdata <= wb_data;      
@@ -158,11 +168,18 @@ module MemoryController(
 
     // Writing from mem to cache
     if ( // if more than one is high
-      (need_l1C_write[0] & need_l1C_write[1]) ||
-      (need_l1C_write[1] & need_l1C_write[2]) ||
-      (need_l1C_write[0] & need_l1C_write[2])
+      // (need_l1C_write[0] & need_l1C_write[1]) ||
+      // (need_l1C_write[1] & need_l1C_write[2]) ||
+      // (need_l1C_write[0] & need_l1C_write[2])
+      (need_l1C_write[0] | need_l1C_write[1] | need_l1C_write[2])
     ) begin
       pause_mem_op <= 1;
+      if (need_l1C_write[0])
+        Mreq1 <= 0;
+      if (need_l1C_write[1])
+        Mreq2 <= 0;
+      if (need_l1C_write[2])
+        Mreq3 <= 0;
     end else begin
       pause_mem_op <= 0;
     end
@@ -222,7 +239,7 @@ module L1Cache(
   assign tag3 = waddr[15:3];
 
   always_ff @(posedge clk) begin
-    $display("[%0t] Cache", $time); // DEBUG_CACHE
+    $display("\n[%0t] Cache", $time); // DEBUG_CACHE
     $display("V | D | addr | data "); // DEBUG_CACHE
     for (int i=0;i<8;i++) begin // DEBUG_CACHE
       $display("%h | %h | %04h | %04h", l1valid[i], l1dirty[i], {l1tag[i], i[2:0]}, l1data[i]); // DEBUG_CACHE
@@ -230,33 +247,33 @@ module L1Cache(
 
     if (req1) begin
       if (l1tag[idx1] == tag1 && l1valid[idx1] == 1) begin
-      //   $display("[%0t] HIT 1", $time); // DEBUG_HIGH
+      //    $display("[%0t] HIT 1", $time); // DEBUG_HIGH
         d1 <= l1data[idx1];
         h1 <= 1;
       end else begin
-      //   $display("[%0t] MISS 1", $time); // DEBUG_HIGH
+      //    $display("[%0t] MISS 1", $time); // DEBUG_HIGH
         h1 <= 0;
       end
     end
 
     if (req2) begin
       if (l1tag[idx2] == tag2 && l1valid[idx2] == 1) begin
-      //   $display("[%0t] HIT 2", $time); // DEBUG_HIGH
+      //    $display("[%0t] HIT 2", $time); // DEBUG_HIGH
         d2 <= l1data[idx2];
         h2 <= 1;
       end else begin
-      //   $display("[%0t] MISS 2", $time); // DEBUG_HIGH
+      //    $display("[%0t] MISS 2", $time); // DEBUG_HIGH
         h2 <= 0;
       end
     end
 
     if (req3) begin
       if (l1tag[idx3] == tag3 && l1valid[idx3] == 1) begin
-      //   $display("[%0t] HIT 3", $time); // DEBUG_HIGH
+      //    $display("[%0t] HIT 3", $time); // DEBUG_HIGH
         d3 <= l1data[idx3];
         h3 <= 1;
       end else begin
-      //   $display("[%0t] MISS 3", $time); // DEBUG_HIGH
+      //    $display("[%0t] MISS 3", $time); // DEBUG_HIGH
         h3 <= 0;
       end
     end
@@ -265,7 +282,7 @@ module L1Cache(
   always_ff @(posedge clk) begin
     if (is_w) begin
       if (l1dirty[idx3]) begin
-      //   $display("[%0t] DIRTY", $time); // DEBUG_HIGH
+      //    $display("[%0t] DIRTY", $time); // DEBUG_HIGH
         wb_data <= l1data[idx3];
         wb_addr <= {l1tag[idx3], idx3};
         is_dirty <= 1;
@@ -458,21 +475,17 @@ module tb_MemoryController;
   end
 
   initial begin
-    mwe = 0; req1 = 1; req2 = 1; req3 = 1;
-    a1 = 16'h0000; a2 = 16'h0001; waddr = 16'h0002; #100;
+    mwe = 0; req1 = 1; req2 = 1; req3 = 0;
+    a1 = 16'h0000; a2 = 16'h0001; waddr = 16'h0002; #80;
     $display("[%0t] Memory at addr %04X = %04X", $time, a1, d1);
     $display("[%0t] Memory at addr %04X = %04X", $time, a2, d2);
     $display("[%0t] Memory at addr %04X = %04X", $time, waddr, d3);
 
-    mwe = 0; req1 = 1; req2 = 1; req3 = 0;
-    a1 = 16'h0003; a2 = 16'h0004; #100;
+    mwe = 0; req1 = 1; req2 = 1; req3 = 1;
+    a1 = 16'h0004; a2 = 16'h0009; waddr = 16'h000A; #80;
     $display("[%0t] Memory at addr %04X = %04X", $time, a1, d1);
     $display("[%0t] Memory at addr %04X = %04X", $time, a2, d2);
-
-    mwe = 0; req1 = 1; req2 = 1; req3 = 0;
-    a1 = 16'h0005; a2 = 16'h0008; #100;
-    $display("[%0t] Memory at addr %04X = %04X", $time, a1, d1);
-    $display("[%0t] Memory at addr %04X = %04X", $time, a2, d2);
+    $display("[%0t] Memory at addr %04X = %04X", $time, waddr, d3);
 
 
     $finish;
