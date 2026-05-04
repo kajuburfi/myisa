@@ -23,6 +23,91 @@ This has primarily been inspired from MIPS, IAS and RISC V ISAs.
 #### Pipeline with forwarding, stalls and control hazard fix
 ![Pipeline with ctrl fix](./pipelined/diagrams/myisa_pipelined_ctrl_hazard_fix.png)
 
+## Directory Structure
+
+This is the output of `tree` or(`eza -T`).
+
+```
+ .
+├──  ARCH.md
+├── 󰂺 README.md
+├──  LICENSE
+│
+├──  c_impl
+│   ├── 󰡯 assembler
+│   ├──  assembler.c
+│   ├── 󰡯 computer
+│   ├──  computer.c
+│   ├──  output.bin
+│   └── 󰂺 README.md
+│
+├──  pipelined
+│   ├── 󰡯 assembler
+│   ├──  assembler.c
+│   ├──  dump.vcd
+│   ├── 󱊧 mem.hex
+│   ├── 󰡯 proc
+│   ├── 󰂺 README.md
+│   ├──  diagrams
+│   │   ├──  myisa_pipelined_basic.excalidraw
+│   │   ├──  myisa_pipelined_basic.png
+│   │   ├──  myisa_pipelined_ctrl.excalidraw
+│   │   ├──  myisa_pipelined_ctrl.png
+│   │   ├──  myisa_pipelined_ctrl_hazard_fix.png
+│   │   ├──  myisa_pipelined_fwd.excalidraw
+│   │   ├──  myisa_pipelined_fwd.png
+│   │   ├──  myisa_pipelined_stall.excalidraw
+│   │   └──  myisa_pipelined_stall.png
+│   └── 󰣞 src
+│       ├── 󰍛 alu.sv
+│       ├── 󰍛 cache.sv
+│       ├── 󰍛 ctrl_unit.sv
+│       ├── 󰍛 dmem.sv
+│       ├── 󰍛 hazard_unit.sv
+│       ├── 󰍛 imem.sv
+│       ├── 󰍛 mainmem.sv
+│       ├── 󰍛 pipeline_regs.sv
+│       ├── 󰍛 regfile.sv
+│       ├── 󰍛 tb_proc.sv
+│       ├── 󰍛 tools.sv
+│       └── 󰍛 top.sv
+│
+├──  single_cycle
+│   ├── 󰡯 assembler
+│   ├──  assembler.c -> ../pipelined/assembler.c
+│   ├──  dump.vcd
+│   ├──  img.jpg
+│   ├──  myisa_single_cycle.excalidraw
+│   ├──  myisa_single_cycle.png
+│   ├──  output.bin
+│   ├── 󰡯 proc
+│   ├── 󰍛 read_bin_file.sv
+│   ├── 󰂺 README.md
+│   └── 󰣞 src
+│       ├── 󰍛 alu.sv
+│       ├── 󰍛 ctrl_unit.sv
+│       ├── 󰍛 dmem.sv
+│       ├── 󰍛 imem.sv
+│       ├── 󰍛 regfile.sv
+│       ├── 󰍛 tb_proc.sv
+│       ├── 󰍛 tools.sv
+│       └── 󰍛 top.sv
+└──  tests
+    ├──  allcmds.asm
+    ├──  fact.asm
+    ├──  fibo.asm
+    ├──  largest_num.asm
+    └──  test.asm
+```
+
+We have a LICENSE, README and ARCH in the root directory.
+The `c_impl` directory has the assembler and computer, along with its README, and a bunch of generated files(executable `assembler`, `computer`, `output.bin`).
+The `single_cycle` directory has all the necessary files(and a couple of generated files) to run the single cycle processor.
+The single cycle also has the processor diagram along with it(and its excalidraw file).
+The instructions are in the README. Note that the assembler for pipelined and single cycle processors are same, and are hence symlinked.
+The `pipelined` directory is built similarly, but it has a couple more SystemVerilog files, because of hazard fixes and pipelines.
+Finally, the `tests` directory basically has a bunch of `myisa` assembly files.
+
 ## ISA
 The specifcations of the ISA can be found in the [Architecture](./ARCH.md) file. Please refer that.
 Here is a table with all the instructions implemented.
@@ -38,17 +123,18 @@ Here is a table with all the instructions implemented.
 | `0110` | `sub r1, r2, r3` | `r1 = r2 - r3` |
 | `0111` | `mul r1, r2` | Stores the most significant 16 bits of `r1*r2` into `hi` and the least significant bits into `lo`|
 | `1000` | `div r1, r2` | `hi = r1/r2` (integer division), `lo = r1%r2`(remainder) |
-| `1001` | `cmp r1, r2` | Sets the `flg` register with the required value. |
+| `1001` | `cmp r1, r2` | Sets the `flg` register with the required value.(`1` if equal, `2` if `r1` greater than `r2`) |
 | `1010` | `b r1` | Sets the `pc` to whatever value is in `r1` |
 | `1011` | `beq r1` | Sets `pc = r1` if `flg.eq == 1` |
 | `1100` | `bgt r1` | Sets `pc = r1` if `flg.gt == 1` |
 
 I am restricted mainly by the number of instructions that I can include in my ISA, since I restrict the opcode to be 4 bits.
+Note that `mul` and `div` instructions are not yet implemented in `myisa` pipelined version.
 
 ## Implementations
 
-As of writing this README, I've implemented this ISA through [C code](./c_impl) and in a [single cycle](./single_cycle) organisation.
-I'm currently working on making this pipelined, with some _advanced_ microarchitectural principles as well(like branch predictor, superscalar,
+As of writing this README, I've implemented this ISA through [C code](./c_impl), a [single cycle](./single_cycle) and a [pipelined](./pipelined) organisation.
+I'm currently working on adding some _advanced_ microarchitectural principles as well(like branch predictor, superscalar, cache hierarchies,
 out of order execuction, etc).
 
 ## References

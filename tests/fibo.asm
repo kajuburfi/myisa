@@ -20,7 +20,7 @@ sw r2, r9,
 cmp r9, r0
 ; Break out of loop condition
 addi r8, pc,
-;; This value must be (6+number of lines in LOGIC)
+;; This value must be (8+number of lines in LOGIC)
 0d-15
 bgt r8
 

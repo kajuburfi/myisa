@@ -10,6 +10,8 @@ Refer the [Architecture](../ARCH.md) for more information regarding how the ISA 
 
 ## How to use
 
+I would recommend you to try out either the [Single Cycle](../single_cycle) version or the [pipelined](../pipelined) version.
+Those are better made than this. This was more of a PoC style simulator for `myisa`.
 The `assembler.c` assembles your `myisa` assembly into the binary file `output.bin`. You can run this using the `computer.c`, which simulates
 a computer on your computer, and you can run it by passing `output.bin` to this program. Example:
 ```sh

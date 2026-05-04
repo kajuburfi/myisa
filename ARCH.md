@@ -142,11 +142,11 @@ It is case-sensitive, but not space/comma sensitive.
 | `0110` | `sub r1, r2, r3` | `r1 = r2 - r3` |
 | `0111` | `mul r1, r2` | Stores the most significant 16 bits of `r1*r2` into `hi` and the least significant bits into `lo`|
 | `1000` | `div r1, r2` | `hi = r1/r2` (integer division), `lo = r1%r2`(remainder) |
-| `1001` | `cmp r1, r2` | Sets the `flg` register with the required value. |
+| `1001` | `cmp r1, r2` | Sets the `flg` register with the required value.(`1` if equal, `2` if `r1` greater than `r2`) |
 | `1010` | `b r1` | Sets the `pc` to whatever value is in `r1` |
 | `1011` | `beq r1` | Sets `pc = r1` if `flg.eq == 1` |
 | `1100` | `bgt r1` | Sets `pc = r1` if `flg.gt == 1` |
 
 Clearly, this is not a very involved ISA, but it is enough to implement basically anything a modern computer can(with a lot more effort).
 It is mostly a PoC, and sort of an exercise for me.
-Some examples here are the [Fibonacci series](./tests/fibo.asm) and the [Factorial function](./tests/fact.asm).
+Some examples here are the [Fibonacci series](./tests/fibo.asm), [Factorial function](./tests/fact.asm) and [Largest element in an array](./tests/largest_num.asm).

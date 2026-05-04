@@ -5,7 +5,7 @@ The circuit diagram for the processor is given here.
 
 ![Processor diagram](./myisa_single_cycle.png)
 
-I will not intensively document this portion, since the main one would be the pipelined processor for `myisa`.
+I will not intensively document this portion, since the main one would be the [pipelined](../pipelined) processor for `myisa`.
 It is to be noted, however, that the instructions `mul` and `div` have not been implemented.
 They are commented out in the ALU, since they are not directly synthesizable. 
 
@@ -17,7 +17,7 @@ Assembling(`pwd` is this directory),
 ```sh
 $ gcc -o assembler assembler.c
 $ ./assembler <input asm file>
-$ ./assembler fibo.asm
+$ ./assembler ../tests/fibo.asm # example
 ```
 
 You will now get a `output.bin` file in this directory. This is overwritten everytime you assemble.
