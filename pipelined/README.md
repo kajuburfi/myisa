@@ -14,4 +14,4 @@ To Be filled in.
 ![Pipeline with fwd and stalls](./diagrams/myisa_pipelined_stall.png)
 
 #### Pipeline with forwarding, stalls and control hazard fix
-![Pipeline with ctrl fix](./diagrams/myisa_pipelined_ctrl.png)
+![Pipeline with ctrl fix](./diagrams/myisa_pipelined_ctrl_hazard_fix.png)

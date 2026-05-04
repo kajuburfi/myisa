@@ -21,7 +21,7 @@ This has primarily been inspired from MIPS, IAS and RISC V ISAs.
 ![Pipeline with fwd and stalls](./pipelined/diagrams/myisa_pipelined_stall.png)
 
 #### Pipeline with forwarding, stalls and control hazard fix
-![Pipeline with ctrl fix](./pipelined/diagrams/myisa_pipelined_ctrl.png)
+![Pipeline with ctrl fix](./pipelined/diagrams/myisa_pipelined_ctrl_hazard_fix.png)
 
 ## ISA
 The specifcations of the ISA can be found in the [Architecture](./ARCH.md) file. Please refer that.
