@@ -28,83 +28,83 @@ This has primarily been inspired from MIPS, IAS and RISC V ISAs.
 This is the output of `tree` or(`eza -T`).
 
 ```
- .
-├──  ARCH.md
-├── 󰂺 README.md
-├──  LICENSE
-│
-├──  c_impl
-│   ├── 󰡯 assembler
-│   ├──  assembler.c
-│   ├── 󰡯 computer
-│   ├──  computer.c
-│   ├──  output.bin
-│   └── 󰂺 README.md
-│
-├──  pipelined
-│   ├── 󰡯 assembler
-│   ├──  assembler.c
-│   ├──  dump.vcd
-│   ├── 󱊧 mem.hex
-│   ├── 󰡯 proc
-│   ├── 󰂺 README.md
-│   ├──  diagrams
-│   │   ├──  myisa_pipelined_basic.excalidraw
-│   │   ├──  myisa_pipelined_basic.png
-│   │   ├──  myisa_pipelined_ctrl.excalidraw
-│   │   ├──  myisa_pipelined_ctrl.png
-│   │   ├──  myisa_pipelined_ctrl_hazard_fix.png
-│   │   ├──  myisa_pipelined_fwd.excalidraw
-│   │   ├──  myisa_pipelined_fwd.png
-│   │   ├──  myisa_pipelined_stall.excalidraw
-│   │   └──  myisa_pipelined_stall.png
-│   └── 󰣞 src
-│       ├── 󰍛 alu.sv
-│       ├── 󰍛 cache.sv
-│       ├── 󰍛 ctrl_unit.sv
-│       ├── 󰍛 dmem.sv
-│       ├── 󰍛 hazard_unit.sv
-│       ├── 󰍛 imem.sv
-│       ├── 󰍛 mainmem.sv
-│       ├── 󰍛 pipeline_regs.sv
-│       ├── 󰍛 regfile.sv
-│       ├── 󰍛 tb_proc.sv
-│       ├── 󰍛 tools.sv
-│       └── 󰍛 top.sv
-│
-├──  single_cycle
-│   ├── 󰡯 assembler
-│   ├──  assembler.c -> ../pipelined/assembler.c
-│   ├──  dump.vcd
-│   ├──  img.jpg
-│   ├──  myisa_single_cycle.excalidraw
-│   ├──  myisa_single_cycle.png
-│   ├──  output.bin
-│   ├── 󰡯 proc
-│   ├── 󰍛 read_bin_file.sv
-│   ├── 󰂺 README.md
-│   └── 󰣞 src
-│       ├── 󰍛 alu.sv
-│       ├── 󰍛 ctrl_unit.sv
-│       ├── 󰍛 dmem.sv
-│       ├── 󰍛 imem.sv
-│       ├── 󰍛 regfile.sv
-│       ├── 󰍛 tb_proc.sv
-│       ├── 󰍛 tools.sv
-│       └── 󰍛 top.sv
-└──  tests
-    ├──  allcmds.asm
-    ├──  fact.asm
-    ├──  fibo.asm
-    ├──  largest_num.asm
-    └──  test.asm
+.
+├── ARCH.md
+├── README.md
+├── LICENSE
+├── c_impl
+│   ├── assembler
+│   ├── assembler.c
+│   ├── computer
+│   ├── computer.c
+│   └── README.md
+├── pipelined
+│   ├── assembler
+│   ├── assembler.c
+│   ├── dump.vcd
+│   ├── mem.hex
+│   ├── proc
+│   ├── README.md
+│   ├── diagrams
+│   │   ├── myisa_pipelined_basic.excalidraw
+│   │   ├── myisa_pipelined_basic.png
+│   │   ├── myisa_pipelined_ctrl.excalidraw
+│   │   ├── myisa_pipelined_ctrl.png
+│   │   ├── myisa_pipelined_ctrl_hazard_fix.png
+│   │   ├── myisa_pipelined_fwd.excalidraw
+│   │   ├── myisa_pipelined_fwd.png
+│   │   ├── myisa_pipelined_stall.excalidraw
+│   │   └── myisa_pipelined_stall.png
+│   └── src
+│       ├── alu.sv
+│       ├── cache.sv
+│       ├── ctrl_unit.sv
+│       ├── dmem.sv
+│       ├── hazard_unit.sv
+│       ├── imem.sv
+│       ├── mainmem.sv
+│       ├── pipeline_regs.sv
+│       ├── regfile.sv
+│       ├── tb_proc.sv
+│       ├── tools.sv
+│       └── top.sv
+├── single_cycle
+│   ├── assembler
+│   ├── assembler.c -> ../pipelined/assembler.c
+│   ├── dump.vcd
+│   ├── img.jpg
+│   ├── myisa_single_cycle.excalidraw
+│   ├── myisa_single_cycle.png
+│   ├── output.bin
+│   ├── proc
+│   ├── read_bin_file.sv
+│   ├── README.md
+│   └── src
+│       ├── alu.sv
+│       ├── ctrl_unit.sv
+│       ├── dmem.sv
+│       ├── imem.sv
+│       ├── regfile.sv
+│       ├── tb_proc.sv
+│       ├── tools.sv
+│       └── top.sv
+└── tests
+    ├── a.asm
+    ├── allcmds.asm
+    ├── fact.asm
+    ├── fibo.asm
+    ├── largest_num.asm
+    └── test.asm
 ```
 
 We have a LICENSE, README and ARCH in the root directory.
+
 The `c_impl` directory has the assembler and computer, along with its README, and a bunch of generated files(executable `assembler`, `computer`, `output.bin`).
+
 The `single_cycle` directory has all the necessary files(and a couple of generated files) to run the single cycle processor.
 The single cycle also has the processor diagram along with it(and its excalidraw file).
 The instructions are in the README. Note that the assembler for pipelined and single cycle processors are same, and are hence symlinked.
+
 The `pipelined` directory is built similarly, but it has a couple more SystemVerilog files, because of hazard fixes and pipelines.
 Finally, the `tests` directory basically has a bunch of `myisa` assembly files.
 
