@@ -55,7 +55,8 @@ module top(
   dff #(16, 16'hFFFF) dff_pc(clk, ~stallF, rst, pcnew, pcF);
   sub1 sub1_2(pcF, pcm1);
 
-  imem imem_module(pcF, pcm1, instrF, immF);
+  // imem imem_module(pcF, pcm1, instrF, immF);
+  mainMemory mem_module(clk, is_mweM, aluoutM, Hrr1M, pcF, pcm1, instrF, immF, rmM);
   ctrl_unit ctrl_unit_module(instrF, is_immF, is_rweF, is_mweF, is_memoutF, is_rdF, is_pc_regF, ctrl_syscallF, ctrl_aluF, ctrl_bF);
 
   fd_pr fd_pr(clk, ~stallD, is_b,
@@ -104,7 +105,7 @@ module top(
   aluoutM, Hrr1M, instrM
   );
 
-  dmem dmem_module(clk, is_mweM, aluoutM, Hrr1M, rmM);
+  // dmem dmem_module(clk, is_mweM, aluoutM, Hrr1M, rmM);
 
   mw_pr mw_pr(clk,
   is_rweM, is_memoutM,
