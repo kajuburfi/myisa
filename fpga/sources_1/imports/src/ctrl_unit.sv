@@ -15,8 +15,14 @@ module ctrl_unit(
   // end
   always_comb begin
     if (instr == 16'hFFFF) begin
-      ctrl_syscall = 3'b111;
+      ctrl_syscall = 3'b111; // Finished processing
       ctrls = 10'b00000_000_00;
+    end else if (instr[15:8] == 8'hF1) begin
+      ctrl_syscall = 3'b001; // Print out data from instrF
+      ctrls = 10'b00000_000_00;
+    end else if (instr[15:8] == 8'hF2) begin
+      ctrl_syscall = 3'b010; // Print out data from next imm
+      ctrls = 10'b10000_000_00; // is_imm is asserted
     end else begin
       ctrl_syscall = 3'b000;
       case (op) 

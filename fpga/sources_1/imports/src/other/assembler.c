@@ -166,6 +166,20 @@ int main(int argc, char *argv[]) {
   char buf[256]; // This is to read a line of not more than 256 characters
   // The condition in the while iterates over every line in the file
   while (fgets(buf, sizeof(buf), fp) != NULL) {
+    // If it's a print statement, do that
+    if (strncmp(buf, "print ", 6) == 0) {
+      char str_to_print[100] = ""; // max string length of 100 chars
+      strncpy(str_to_print, buf + 6, strlen(buf) - 7);
+      // Remove the last `\n` from the string "buf" which is why in subtraction
+      // it's 7, but in addition it's 6
+      char *str2print = str_to_print;
+      for (char c = *str2print; c != '\0'; c = *++str2print) {
+        fprintf(fop, "F1%02x\n", (unsigned char)c);
+        num_instr++;
+      }
+      continue;
+    }
+    // else
     del_extra_spaces_n_commas(buf); // Does exactly what it says it does
     // If it's an empty line, skip over.
     if (strcmp(buf, "\0") == 0)

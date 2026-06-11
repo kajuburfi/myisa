@@ -1,6 +1,7 @@
 module proc(
   input logic clk, rst,
   output logic [2:0] ctrl_syscall,
+  // For memory operations
   output logic is_mweM,
   output logic [15:0] aluoutM,
   output logic [15:0] Hrr1M,
@@ -8,7 +9,10 @@ module proc(
   output logic [15:0] pcm1,
   input logic [15:0] instrF,
   input logic [15:0] immF,
-  input logic [15:0] rmM
+  input logic [15:0] rmM,
+  // For hw io
+  output logic [15:0] instrW,
+  output logic [15:0] immW
 );
   // Internal wires
   logic [15:0] pcm2, pcnext, pcnew,  
@@ -18,8 +22,8 @@ module proc(
   logic [15:0] aluout;
   logic [15:0] pcD, instrD, immD, rr1D, rr2D;
   logic [15:0] pcE, instrE, immE, rr1E, rr2E, aluoutE, Hrr1E;
-  logic [15:0] instrM;
-  logic [15:0] instrW, aluoutW, rmW;
+  logic [15:0] instrM, immM;
+  logic [15:0] instrW, aluoutW, rmW, immW;
   // Ctrl signals
   logic is_b;
   logic is_immF, is_rweF, is_mweF, is_rdF, is_memoutF, is_pc_regF;
@@ -105,19 +109,19 @@ module proc(
   em_pr em_pr(clk, rst,
   is_rweE, is_mweE, is_memoutE,
   ctrl_syscallE,
-  aluoutE, Hrr1E, instrE,
+  aluoutE, Hrr1E, instrE, immE,
   is_rweM, is_mweM, is_memoutM,
   ctrl_syscallM,
-  aluoutM, Hrr1M, instrM
+  aluoutM, Hrr1M, instrM, immM
   );
 
   mw_pr mw_pr(clk, rst,
   is_rweM, is_memoutM,
   ctrl_syscallM,
-  aluoutM, rmM, instrM,
+  aluoutM, rmM, instrM, immM,
   is_rweW, is_memoutW,
   ctrl_syscallW,
-  aluoutW, rmW, instrW
+  aluoutW, rmW, instrW, immW
   );
 
   assign ctrl_syscall = (pcF == 16'h0010) ? 3'b111 : ctrl_syscallW;

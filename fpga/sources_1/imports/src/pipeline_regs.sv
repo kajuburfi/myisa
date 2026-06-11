@@ -84,10 +84,10 @@ module em_pr(
   input logic clk, rst,
   input logic is_rwe_old, is_mwe_old, is_memout_old,
   input logic [2:0] ctrl_syscall_old,
-  input logic [15:0] aluout_old, rr1_old, instr_old,
+  input logic [15:0] aluout_old, rr1_old, instr_old, imm_old,
   output logic is_rwe, is_mwe, is_memout,
   output logic [2:0] ctrl_syscall,
-  output logic [15:0] aluout, rr1, instr
+  output logic [15:0] aluout, rr1, instr, imm
 );
   always_ff @(posedge clk) begin
     if (rst) begin
@@ -98,6 +98,7 @@ module em_pr(
       aluout <= '0;
       rr1 <= '0;
       instr <= '0;
+      imm <= '0;
     end else begin
       is_rwe <= is_rwe_old;
       is_mwe <= is_mwe_old;
@@ -106,6 +107,7 @@ module em_pr(
       aluout <= aluout_old;
       rr1 <= rr1_old;
       instr <= instr_old;
+      imm <= imm_old;
     end
   end
 endmodule
@@ -114,10 +116,10 @@ module mw_pr(
   input logic clk, rst,
   input logic is_rwe_old, is_memout_old,
   input logic [2:0] ctrl_syscall_old,
-  input logic [15:0] aluout_old, rm_old, instr_old,
+  input logic [15:0] aluout_old, rm_old, instr_old, imm_old,
   output logic is_rwe, is_memout,
   output logic [2:0] ctrl_syscall,
-  output logic [15:0] aluout, rm, instr
+  output logic [15:0] aluout, rm, instr, imm
 );
   always_ff @(posedge clk) begin
     if (rst) begin
@@ -127,6 +129,7 @@ module mw_pr(
       aluout <= 0;
       rm <= 0;
       instr <= 0;
+      imm <= 0;
     end else begin
       is_rwe <= is_rwe_old;
       is_memout <= is_memout_old;
@@ -134,6 +137,7 @@ module mw_pr(
       aluout <= aluout_old;
       rm <= rm_old;
       instr <= instr_old;
+      imm <= imm_old;
     end
   end
 endmodule

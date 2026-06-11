@@ -115,3 +115,41 @@ always @(posedge clk or posedge reset) begin
     end
 end
 endmodule
+
+// pm => programming memory
+module fsm_pgm_mem(
+  input clk, rst,
+  input logic pgm_mem_pedge,
+  input logic [15:0] out_data,
+  output logic pm_btnU, pm_btnC, pm_btnEXT
+);
+  logic pm_active = 0;
+  logic pm_done = 0;
+  always_ff @(posedge clk) begin
+    if (!pm_active && pgm_mem_pedge) begin
+      pm_active <= 1;
+    end
+    if (pm_done) begin
+      pm_active <= 0;
+    end
+
+    if (&out_data)
+      pm_done <= 1;
+    else
+      pm_done <= 0;
+  end
+
+  logic q0, q1;
+  dff #(1, 0) fsm_dffQ1(clk, 1'b1, (pm_active && ~&out_data), (pgm_mem_pedge & (q1 ^ q0)), q1);
+  dff #(1, 0) fsm_dffQ0(clk, 1'b1, (pm_active && ~&out_data), (pgm_mem_pedge & (~q0 | (q1&q0))), q0);
+
+  always_comb begin
+    case ({q1, q0})
+      default: {pm_btnU, pm_btnC, pm_btnEXT} = 3'b000;
+      2'b00: {pm_btnU, pm_btnC, pm_btnEXT} = 3'b000;
+      2'b01: {pm_btnU, pm_btnC, pm_btnEXT} = 3'b100;
+      2'b10: {pm_btnU, pm_btnC, pm_btnEXT} = 3'b010;
+      2'b11: {pm_btnU, pm_btnC, pm_btnEXT} = 3'b001;
+    endcase
+  end
+endmodule
