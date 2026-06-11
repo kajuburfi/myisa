@@ -1,6 +1,6 @@
 # UART protocol implementation
 
-The directory [`imports/temp`](./imports/temp) has been replicated from Anas Salah Eddin's github [repository `ece_3300`](https://github.com/aseddin/ece_3300/),
+The directory [`imports/`](./imports/) has been replicated from Anas Salah Eddin's github [repository `ece_3300`](https://github.com/aseddin/ece_3300/),
 and specifically this [directory](https://github.com/aseddin/ece_3300/tree/main/M12%20UART/Source).
 It has not been replicated one-to-one.
 
