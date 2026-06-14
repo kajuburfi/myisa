@@ -16,6 +16,10 @@ Every program that is loaded is stored from `0xFFFF` and grows downwards.
 All the data that can be stored starts from `0x0000` and grows upwards.
 Following this, we don't implement a clear distinction between the two sections.
 
+> Note: For the [FPGA](./fpga) version, due to memory issues(less memory available - or I'm not able to make full use of it yet),
+> I've made it such that the memory tape goes from `0x0000` to `0x0FFF`, which is 4096 words(or 8192 bytes).
+
+
 ```mermaid
 
 ---
@@ -147,6 +151,26 @@ It is case-sensitive, but not space/comma sensitive.
 | `1011` | `beq r1` | Sets `pc = r1` if `flg.eq == 1` |
 | `1100` | `bgt r1` | Sets `pc = r1` if `flg.gt == 1` |
 
+Along with these, some extra special instructions are as follows. Specifically for the [FPGA](./fpga) version.
+
+- `print `: Works like command line `echo`. It prints the following raw string through UART to the webpage. Note that each character takes a byte, and
+  since we send 1 single byte through the UART communication, each character corresponds to 1 memory word. This needs to be taken into account when using
+  branch statements. Stored as `0xF1<ascii byte>`, for instance, `0xF10A` prints a newline, and `0xF142` prints `B`.     
+  Usage:
+  ```
+  print Hello World!
+  ```
+- `printmem `: You can print a specific nibble of any memory slot with this. It is an instruction that requires an immediate.
+  Stored as `0xF20<nibble number>` and `<imm>`. For example, `0xF200` and `0x0020` would be the first instruction given in Usage.      
+  Usage:
+  ```
+  printmem 0
+  0x0020  
+  printmem 1
+  0x0021
+  ```
+
+Note that `mul` and `div` aren't implemented for the `pipelined` nor the `fpga` version.
 Clearly, this is not a very involved ISA, but it is enough to implement basically anything a modern computer can(with a lot more effort).
 It is mostly a PoC, and sort of an exercise for me.
 Some examples here are the [Fibonacci series](./tests/fibo.asm), [Factorial function](./tests/fact.asm) and [Largest element in an array](./tests/largest_num.asm).

@@ -14,12 +14,6 @@ This has primarily been inspired from MIPS, IAS and RISC V ISAs.
 #### Basic Pipeline(no hazards fix)
 ![Basic pipeline](./pipelined/diagrams/myisa_pipelined_basic.png)
 
-#### Pipeline with forwarding
-![Pipeline with forwarding](./pipelined/diagrams/myisa_pipelined_fwd.png)
-
-#### Pipeline with forwarding and stalls
-![Pipeline with fwd and stalls](./pipelined/diagrams/myisa_pipelined_stall.png)
-
 #### Pipeline with forwarding, stalls and control hazard fix
 ![Pipeline with ctrl fix](./pipelined/diagrams/myisa_pipelined_ctrl_hazard_fix.png)
 
@@ -27,37 +21,81 @@ This has primarily been inspired from MIPS, IAS and RISC V ISAs.
 
 This is the output of `tree` or(`eza -T`).
 
+<details>
+<summary> Complete directory structure </summary>
+<br>
+
+
 ```
 .
 ├── ARCH.md
-├── README.md
-├── LICENSE
 ├── c_impl
-│   ├── assembler
 │   ├── assembler.c
-│   ├── computer
 │   ├── computer.c
 │   └── README.md
-├── pipelined
-│   ├── assembler
-│   ├── assembler.c
-│   ├── dump.vcd
-│   ├── mem.hex
-│   ├── proc
+├── fpga
+│   ├── constrs_1
+│   │   └── imports
+│   │       └── projects
+│   │           └── Nexys4DDR_Master.xdc
+│   ├── pics
+│   │   ├── FPGA_hw_connections.svg
+│   │   └── FPGA_proc.svg
 │   ├── README.md
+│   ├── sources_1
+│   │   ├── imports
+│   │   │   ├── sources_1
+│   │   │   │   ├── imports
+│   │   │   │   │   ├── decoder_generic.v
+│   │   │   │   │   ├── hex2sseg.v
+│   │   │   │   │   ├── mux_8x1_nbit.v
+│   │   │   │   │   ├── sseg_driver.v
+│   │   │   │   │   ├── terminal_demo.v
+│   │   │   │   │   ├── timer_input.v
+│   │   │   │   │   ├── uart.v
+│   │   │   │   │   ├── uart_rx.v
+│   │   │   │   │   └── uart_tx.v
+│   │   │   │   ├── new
+│   │   │   │   │   └── FIFO_ByteToWord_Controller.v
+│   │   │   │   └── README.md
+│   │   │   └── src
+│   │   │       ├── alu.sv
+│   │   │       ├── button.sv
+│   │   │       ├── ctrl_unit.sv
+│   │   │       ├── hazard_unit.sv
+│   │   │       ├── hex_to_7seg.sv
+│   │   │       ├── mainmem.v
+│   │   │       ├── memory.mem
+│   │   │       ├── old_top.sv
+│   │   │       ├── other
+│   │   │       │   ├── assembler.c
+│   │   │       │   ├── fibo.asm
+│   │   │       │   ├── guess_number.asm
+│   │   │       │   ├── multiplication.asm
+│   │   │       │   └── temp.asm
+│   │   │       ├── pipeline_regs.sv
+│   │   │       ├── proc.sv
+│   │   │       ├── regfile.sv
+│   │   │       ├── tools.sv
+│   │   │       └── top.sv
+│   │   └── ip
+│   │       ├── fifo_generator_0
+│   │       │   └── fifo_generator_0.xci
+│   │       └── fifo_generator_1
+│   │           └── fifo_generator_1.xci
+│   └── uart_esp.ino
+├── LICENSE
+├── pipelined
+│   ├── assembler.c
 │   ├── diagrams
-│   │   ├── myisa_pipelined_basic.excalidraw
 │   │   ├── myisa_pipelined_basic.png
-│   │   ├── myisa_pipelined_ctrl.excalidraw
 │   │   ├── myisa_pipelined_ctrl.png
 │   │   ├── myisa_pipelined_ctrl_hazard_fix.png
-│   │   ├── myisa_pipelined_fwd.excalidraw
 │   │   ├── myisa_pipelined_fwd.png
-│   │   ├── myisa_pipelined_stall.excalidraw
 │   │   └── myisa_pipelined_stall.png
+│   ├── README.md
 │   └── src
 │       ├── alu.sv
-│       ├── cache.sv
 │       ├── ctrl_unit.sv
 │       ├── dmem.sv
 │       ├── hazard_unit.sv
@@ -68,16 +106,11 @@ This is the output of `tree` or(`eza -T`).
 │       ├── tb_proc.sv
 │       ├── tools.sv
 │       └── top.sv
+├── README.md
 ├── single_cycle
-│   ├── assembler
 │   ├── assembler.c -> ../pipelined/assembler.c
-│   ├── dump.vcd
 │   ├── img.jpg
-│   ├── myisa_single_cycle.excalidraw
 │   ├── myisa_single_cycle.png
-│   ├── output.bin
-│   ├── proc
-│   ├── read_bin_file.sv
 │   ├── README.md
 │   └── src
 │       ├── alu.sv
@@ -89,13 +122,16 @@ This is the output of `tree` or(`eza -T`).
 │       ├── tools.sv
 │       └── top.sv
 └── tests
-    ├── a.asm
     ├── allcmds.asm
+    ├── division.asm
     ├── fact.asm
     ├── fibo.asm
     ├── largest_num.asm
+    ├── multiplication.asm
     └── test.asm
 ```
+
+</details>
 
 We have a LICENSE, README and ARCH in the root directory.
 
@@ -107,6 +143,10 @@ The instructions are in the README. Note that the assembler for pipelined and si
 
 The `pipelined` directory is built similarly, but it has a couple more SystemVerilog files, because of hazard fixes and pipelines.
 Finally, the `tests` directory basically has a bunch of `myisa` assembly files.
+
+The `fpga` directory is built with Vivado in mind. It contains the `sources_1` and `constr_1` directories as prompted by Vivado.
+It also contains the arduino `.ino` file required for the ESP32.
+The README in that directory explains all there is to what I've done there.
 
 ## ISA
 The specifcations of the ISA can be found in the [Architecture](./ARCH.md) file. Please refer that.
@@ -129,16 +169,18 @@ Here is a table with all the instructions implemented.
 | `1100` | `bgt r1` | Sets `pc = r1` if `flg.gt == 1` |
 
 I am restricted mainly by the number of instructions that I can include in my ISA, since I restrict the opcode to be 4 bits.
-Note that `mul` and `div` instructions are not yet implemented in `myisa` pipelined version.
+Note that `mul` and `div` instructions are not yet implemented in `myisa` pipelined version(nor in the FPGA verision).
+However, I've written `myisa` programs to perform multiplication and division through repeated addition and subtraction.
+This obviously takes many many more clock cycles than if I'd just directly implemented it.
 
 ## Implementations
 
-As of writing this README, I've implemented this ISA through [C code](./c_impl), a [single cycle](./single_cycle) and a [pipelined](./pipelined) organisation.
-I'm currently working on adding some _advanced_ microarchitectural principles as well(like branch predictor, superscalar, cache hierarchies,
-out of order execuction, etc).
+As of writing this README, I've implemented this ISA(as simulations) through [C code](./c_impl), a [single cycle](./single_cycle) and a [pipelined](./pipelined) organisation.
+I've also implemented it in an [FPGA](./fpga) using the NexysA7 Digilent board(Artix-7 FPGA chip).
 
 ## References
 - [Harris and Harris: **Digital Design and Computer Architecture**](https://unidel.edu.ng/focelibrary/books/Digital%20Design%20and%20Computer%20Architecture%20(Harris,%20Sarah,%20Harris,%20David)%20(Z-Library).pdf)(2<sup>nd</sup> edition)
 - [Henessay and Patterson: **Computer Architecture: A Quantitative Approach**](https://www.eng.biu.ac.il/~wimers/files/courses/Computer_Structure_and_Architecture/Books/Hennessy%20%20Patterson%204th%20Eddition.pdf)(4<sup>th</sup> edition)
 - [Shen and Lipasti: **Modern Processor Design: Fundamentals of Superscalar Processors**](https://acs.pub.ro/~cpop/SMPA/Modern%20Processor%20Design_%20Fundamentals%20of%20Superscalar%20Processors%20(%20PDFDrive%20).pdf)
 - [Weste and Harris: **CMOS VLSI Design: A Circuits and Systems Perspective**](https://vlsiworlds.com/wp-content/uploads/2021/04/cmos-vlsi-design-by-weste.pdf)
+- References specific to the FPGA implementation is cited [here](https://github.com/kajuburfi/myisa/tree/master/fpga#resources-and-references)
