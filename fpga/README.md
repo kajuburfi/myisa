@@ -4,6 +4,12 @@ This directory houses the source code written to put `myisa` on an FPGA.
 Board Used: [Nexys A7](https://digilent.com/reference/_media/reference/programmable-logic/nexys-a7/nexys-a7_rm.pdf).
 FPGA Chip in the Nexys A7 is the Artix 7. Along with an [ESP32](https://www.espressif.com/en/products/socs/esp32).
 
+> I've also implemented the same in a Basys3 board. The connections through UART to the ESP32 remains the same.
+> There are slight differences between the NexysA7 and the Basys3 version.
+>
+> The different files are the [top file](./sources_1/imports/src/top_basys.sv) for the Basys3, and the
+> [constraint file](./Basys3_Master.xdc).
+
 The processor design is more or less the same. The `top` file was remade from scratch, since in the previous
 (pipelined) version, I assumed a simulation and wrote the testbench accordingly.
 Now, we have full access to the memory, and can look through and edit the memory using the hardware on the Nexys A7 board.
@@ -27,9 +33,14 @@ The processor remains more or less the same. The only significant changes are as
 
 #### The hardware connections
 
+This diagram shows the wires between the ESP32 and the NexysA7. An extra pushbutton is also added, for ease of use.
+
 ![Hardware connections](./pics/FPGA_hw_connections.svg)
 
-This diagram shows the wires between the ESP32 and the NexysA7. An extra pushbutton is also added, for ease of use.
+For the Basys3 version, here is a picture of the connections. I've left out the powering for the Basys3 board and the
+USB-C connection powering the esp32 from either the USB-A port of the Basys3 board or something external.
+
+![Hardware connections for Basys3](./pics/basys_img.jpeg)
 
 ## Setup
 
@@ -45,6 +56,9 @@ Steps: (follow from any reliable source)
 ## UI/UX
 
 ### General Usage
+
+> There are slight differences in usage between the NexysA7 and the Basys3. Below is the documentation for the NexysA7;
+> I'll write more when I get time and am jobless.
 
 Since we have limited resources at our hand, I had to make several choices regarding UI/UX. Hopefully the choices I've made make sense to you as well.
 Initially, just after flashing, given that you've correctly made the `memory.mem` file(i.e. you've written correct code that doesn't end up in infinite loops),
@@ -78,6 +92,9 @@ in my [guess the number](./sources_1/imports/src/other/guess_number.asm) game.
 Now, for the fun part; using the UART communications and the webpage!
 
 ### Usage of the ESP module
+
+> There are slight differences in usage between the NexysA7 and the Basys3. Below is the documentation for the NexysA7;
+> I'll write more when I get time and am jobless.
 
 Along with the FPGA, we've connected an ESP32 module and an external pushbutton. When we've powered on our NexysA7 board, the red LED in the esp should've also lit up.
 This indicates that the webserver is up and running. You can now go to the respective IP address(which would've shown up in the serial monitor when programming your esp)
@@ -119,3 +136,4 @@ Here are some wonderful resources I made use of in the creation of this project.
   detailed tutorial on how to store a bitfile _permanently_ in the NexysA7's flash memory so that it loads automatically every time(given the jumpers are placed correctly).
   It's insane that I didn't get any other reliable source on the internet for this exact procedure. This works for the NexysA7, even though it is modelled for an ArtyS7.
 - The Digilent NexysA7 board [Refernce Manual](https://digilent.com/reference/_media/reference/programmable-logic/nexys-a7/nexys-a7_rm.pdf).
+- The Digilent Basys3 board [Refernce Manual](https://digilent.com/reference/_media/basys3:basys3_rm.pdf).
